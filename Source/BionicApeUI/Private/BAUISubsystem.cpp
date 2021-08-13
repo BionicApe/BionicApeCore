@@ -13,7 +13,7 @@ UBAUISubsystem* UBAUISubsystem::MyInstance;
 UBAUISubsystem::UBAUISubsystem() :Super()
 {
 	//We set default values that can be overridden by UsersProxy and ProfilesProxy, we can safely delete the following lines if the config file is correct
-	static ConstructorHelpers::FObjectFinder<UBAUIConfig> BAUIConfigRef(TEXT("/BionicApeUI/UIConfig.UIConfig"));
+	static ConstructorHelpers::FObjectFinder<UBAUIConfig> BAUIConfigRef(TEXT("/BionicApeCore/UIConfig.UIConfig"));
 	UIConfig = BAUIConfigRef.Object;
 }
 
