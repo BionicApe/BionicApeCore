@@ -38,5 +38,6 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	
+	UFUNCTION(BlueprintCallable)
 	static UAlertWidget* CreateAlert(UUserWidget* Owner, const FText& Text);
 };

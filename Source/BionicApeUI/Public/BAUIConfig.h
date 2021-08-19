@@ -7,6 +7,8 @@
 #include "BAUIConfig.generated.h"
 
 class UAlertWidget;
+class UButtonStyleAsset;
+class UConfirmWidget;
 
 /**
  * 
@@ -26,5 +28,17 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Widgets)
 	TSubclassOf<UAlertWidget> FailureAlertWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+	TSubclassOf<UConfirmWidget> ConfirmWidgetClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+	UButtonStyleAsset* ButtonStyleNormal;
+
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+	UButtonStyleAsset* ButtonStyleHover;
+
+	UPROPERTY(EditDefaultsOnly, Category = Widgets)
+	UButtonStyleAsset* ButtonStylePressed;
 	
 };

@@ -32,6 +32,8 @@ protected:
 
 public:
 
+	UButton* GetAcceptButton() const { return AcceptButton; }
+
 	UFUNCTION(BlueprintCallable)
 	void SetBodyText(const FText& NewText);
 		

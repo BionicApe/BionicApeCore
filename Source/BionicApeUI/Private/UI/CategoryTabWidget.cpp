@@ -1,32 +1,55 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Created by Bionic Ape. All rights reseved.
 
 
 #include "UI/CategoryTabWidget.h"
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 
+
 bool UCategoryTabWidget::Initialize()
 {
 	if (Super::Initialize())
 	{
-		if (TabTextBlock && TabButton)
+		if (TabButton)
 		{
 			TabButton->OnClicked.AddDynamic(this, &UCategoryTabWidget::OnButtonClicked);
+			Refresh();
 			return true;
 		}
 	}
 	return false;
 }
 
-void UCategoryTabWidget::OnButtonClicked()
+void UCategoryTabWidget::Setup(const FText& NewTabCategoryName, UObject* NewResourceObject)
 {
-	TabSelectedEvent.Broadcast();
+	TabCategoryName = NewTabCategoryName;
+	ResourceObject = NewResourceObject;
+	Refresh();
 }
 
-void UCategoryTabWidget::SetTabText(FText TabText)
+void UCategoryTabWidget::Refresh()
 {
 	if (TabTextBlock)
 	{
-		TabTextBlock->SetText(TabText);
+		TabTextBlock->SetText(TabCategoryName);
 	}
+	if (ResourceObject)
+	{
+		ButtonStyleSelected.Normal.SetResourceObject(ResourceObject);
+		ButtonStyleSelected.Disabled.SetResourceObject(ResourceObject);
+		ButtonStyleSelected.Hovered.SetResourceObject(ResourceObject);
+		ButtonStyleSelected.Pressed.SetResourceObject(ResourceObject);
+
+		ButtonStyleNotSelected.Normal.SetResourceObject(ResourceObject);
+		ButtonStyleNotSelected.Disabled.SetResourceObject(ResourceObject);
+		ButtonStyleNotSelected.Hovered.SetResourceObject(ResourceObject);
+		ButtonStyleNotSelected.Pressed.SetResourceObject(ResourceObject);
+		
+		TabButton->SetStyle(ButtonStyleNotSelected);
+	}
+}
+
+void UCategoryTabWidget::OnButtonClicked()
+{
+	TabSelectedEvent.Broadcast(this);
 }
