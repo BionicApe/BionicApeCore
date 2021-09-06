@@ -9,6 +9,8 @@
 class UBAUIConfig;
 class UAlertWidget;
 class UWidget;
+class UConfirmWidget;
+class OwnerTy;
 
 /**
  *
@@ -38,6 +40,14 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	
+	template <typename OwnerTy = UObject>
+	static UAlertWidget* CreateAlertWidget(OwnerTy* Owner, const FText& Text);
 	UFUNCTION(BlueprintCallable)
 	static UAlertWidget* CreateAlert(UUserWidget* Owner, const FText& Text);
+
+	template <typename OwnerTy = UObject>
+	static UConfirmWidget* CreateConfirmWidget(OwnerTy* Owner, const FText& Text);
+	UFUNCTION(BlueprintCallable)
+	static UConfirmWidget* CreateConfirm(UUserWidget* Owner, const FText& Text);
+
 };

@@ -27,6 +27,7 @@ public class BionicApeUI : ModuleRules
 				"Core",
 				"UMG",
 				"Engine",
+				"BionicApeCore"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);

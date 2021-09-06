@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Interfaces/BAHUDInterface.h"
 #include "ControlComponent.generated.h"
 
 class APlayerController;
@@ -21,4 +22,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AHUD* GetHUD() const;
+
+	TScriptInterface<IBAHUDInterface> GetBAHUD() const;
+
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_Notify(bool bIsSuccessful, const FString& Message);
 };
