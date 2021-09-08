@@ -9,6 +9,7 @@
 class UButton;
 class UTextBlock;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBAWidgetClosed, UWidget*, Widget);
 
 /**
  * 
