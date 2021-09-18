@@ -26,11 +26,6 @@
 			"LoadingPhase": "Default"
 		},
 		{
-			"Name": "BionicApeEditor",
-			"Type": "Editor",
-			"LoadingPhase": "Default"
-		},
-		{
 			"Name": "BionicApeUIEditor",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
