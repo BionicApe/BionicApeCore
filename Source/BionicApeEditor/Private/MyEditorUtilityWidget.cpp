@@ -1,23 +1,21 @@
 // Created by Bionic Ape. All rights reseved.
 
 #include "MyEditorUtilityWidget.h"
-#include "EditorLevelLibrary.h"
 #include "EditorAssetLibrary.h"
 #include "Components/Button.h"
 #include "Components/DetailsView.h"
+#include "Subsystems/EditorActorSubsystem.h"
 
 
 
-#pragma region OrganizeWorldOutliner
 
 bool UMyEditorUtilityWidget::Initialize()
 {
-
 	if (!Super::Initialize())
 	{
 		return false;
 	}
-	
+
 	if (!ensure(Button_OrganizeWorldOutliner != nullptr)) return false;
 	Button_OrganizeWorldOutliner->OnClicked.AddDynamic(this, &UMyEditorUtilityWidget::OrganizeWorldOutliner);
 
@@ -32,7 +30,7 @@ bool UMyEditorUtilityWidget::Initialize()
 
 	if (!ensure(Button_RemoveEmptyFolders != nullptr)) return false;
 	Button_RemoveEmptyFolders->OnClicked.AddDynamic(this, &UMyEditorUtilityWidget::RemoveEmptyFolders);
-	
+
 	DetailsView_General->SetObject(this);
 	DetailsView_OrganizeWorldOutliner->SetObject(this);
 	DetailsView_SetTextureParams->SetObject(this);
@@ -41,49 +39,46 @@ bool UMyEditorUtilityWidget::Initialize()
 	return true;
 }
 
+
 void UMyEditorUtilityWidget::OrganizeWorldOutliner()
 {
-	TArray<AActor*> AllActors = UEditorLevelLibrary::GetAllLevelActors();
-	for (AActor* Actor : AllActors)
+	if (UEditorActorSubsystem* EditorActorSubsystem = GEditor->GetEditorSubsystem<UEditorActorSubsystem>())
 	{
-		if (ensure(Actor))
+		for (AActor* Actor : EditorActorSubsystem->GetAllLevelActors())
 		{
-			const FName* FolderName = FolderMap.Find(Actor->GetClass());
-			if (ensure(FolderName))
+			if (ensure(Actor))
 			{
-				Actor->SetFolderPath(*FolderName);
-			}
-		}
-	}
-}
-
-#pragma endregion
-
-#pragma region DeleteNullSMActors
-
-void UMyEditorUtilityWidget::DeleteNullSMActors()
-{
-	TArray<AActor*> AllActors = UEditorLevelLibrary::GetAllLevelActors();
-	for (AActor* Actor : AllActors)
-	{
-		if (ensure(Actor))
-		{
-			AStaticMeshActor* StaticMeshActor = dynamic_cast<AStaticMeshActor*>(Actor);
-			if (ensure(StaticMeshActor))
-			{
-				UStaticMeshComponent* StaticMeshComponent = StaticMeshActor->GetStaticMeshComponent();
-				if (ensure(StaticMeshComponent) && nullptr == StaticMeshComponent->GetStaticMesh())
+				const FName* FolderName = FolderMap.Find(Actor->GetClass());
+				if (ensure(FolderName))
 				{
-					Actor->Destroy();
+					Actor->SetFolderPath(*FolderName);
 				}
 			}
 		}
 	}
 }
 
-#pragma endregion
-
-#pragma region SetTextureParameter
+void UMyEditorUtilityWidget::DeleteNullSMActors()
+{
+	if (UEditorActorSubsystem* EditorActorSubsystem = GEditor->GetEditorSubsystem<UEditorActorSubsystem>())
+	{
+		for (AActor* Actor : EditorActorSubsystem->GetAllLevelActors())
+		{
+			if (ensure(Actor))
+			{
+				AStaticMeshActor* StaticMeshActor = dynamic_cast<AStaticMeshActor*>(Actor);
+				if (ensure(StaticMeshActor))
+				{
+					UStaticMeshComponent* StaticMeshComponent = StaticMeshActor->GetStaticMeshComponent();
+					if (ensure(StaticMeshComponent) && nullptr == StaticMeshComponent->GetStaticMesh())
+					{
+						Actor->Destroy();
+					}
+				}
+			}
+		}
+	}
+}
 
 void UMyEditorUtilityWidget::SetTextureParameter()
 {
@@ -129,10 +124,6 @@ void UMyEditorUtilityWidget::SearchAndReplace()
 	}
 }
 
-#pragma endregion
-
-#pragma region RemoveEmptyFolders
-
 void UMyEditorUtilityWidget::RemoveEmptyFolders()
 {
 	TArray<FString> AssetsInPath = UEditorAssetLibrary::ListAssets(FolderPath, bRecursive, true);
@@ -144,5 +135,3 @@ void UMyEditorUtilityWidget::RemoveEmptyFolders()
 		}
 	}
 }
-
-#pragma endregion

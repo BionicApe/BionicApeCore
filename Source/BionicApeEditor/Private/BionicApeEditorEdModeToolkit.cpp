@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Created by Bionic Ape. All Rights Reserved.
 
 #include "BionicApeEditorEdModeToolkit.h"
 #include "BionicApeEditorEdMode.h"

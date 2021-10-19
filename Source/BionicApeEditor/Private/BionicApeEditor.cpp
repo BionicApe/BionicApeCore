@@ -1,23 +1,66 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Created by Bionic Ape. All Rights Reserved.
+
+#pragma once
 
 #include "BionicApeEditor.h"
 #include "BionicApeEditorEdMode.h"
+#include "BionicApeEditorCommands.h"
 
-#define LOCTEXT_NAMESPACE "FBionicApeEditorModule"
+#include "BAMainMenuSystem/BAMainMenuSystem.h"
+
+#include "ModuleEditorTool.h"
+#include "LevelEditor.h"
+
+#include "ModuleGeneratorToolDetails.h"
+
+#include "CoreMinimal.h"
+
+#include "ToolMenu.h"
+#include "ToolMenus.h"
+
+
+#include "Widgets/Docking/SDockTab.h"
+#include "Interfaces/IMainFrameModule.h"
+
+
+static const FName BionicApeEditorTabName("BionicApeEditorTab");
+
+#define LOCTEXT_NAMESPACE "BionicApeEditorModule"
 
 void FBionicApeEditorModule::StartupModule()
 {
-	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	FEditorModeRegistry::Get().RegisterMode<FBionicApeEditorEdMode>(FBionicApeEditorEdMode::EM_BionicApeEditorEdModeId, LOCTEXT("BionicApeEditorEdModeName", "BionicApeEditorEdMode"), FSlateIcon(), true);
-}
+	//Style
+	FBionicApeEditorStyle::Initialize();
+	FBionicApeEditorStyle::ReloadTextures();
+	//End Style
 
+	//EditorMode
+	FEditorModeRegistry::Get().RegisterMode<FBionicApeEditorEdMode>(
+		FBionicApeEditorEdMode::EM_BionicApeEditorEdModeId,
+		NSLOCTEXT("EditorModes", "BionicApeEditorEdMode", "BionicApe"),
+		FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), "BionicApeEditor.TabIcon", "BionicApeEditor.TabIcon.Small"),
+		true/*,
+		300*/
+		);
+	//End EditorMode
+	FBAMainMenuSystem::Register();
+	
+	FBionicApeEditorCommands::Register();
+
+	PluginCommands = MakeShareable(new FUICommandList);
+	PluginCommands->MapAction
+	(
+		FBionicApeEditorCommands::Get().OpenPluginWindow,
+		FExecuteAction::CreateStatic(&FBAMainMenuSystem::Launch)
+	);
+}
 void FBionicApeEditorModule::ShutdownModule()
 {
-	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
-	// we call this function before unloading the module.
+	FBAMainMenuSystem::Unregister();
 	FEditorModeRegistry::Get().UnregisterMode(FBionicApeEditorEdMode::EM_BionicApeEditorEdModeId);
+	FBionicApeEditorStyle::Shutdown();
 }
 
 #undef LOCTEXT_NAMESPACE
-	
+
 IMPLEMENT_MODULE(FBionicApeEditorModule, BionicApeEditor)

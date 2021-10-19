@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Created by Bionic Ape. All Rights Reserved.
 
 #pragma once
 
@@ -12,4 +12,6 @@ public:
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+	
+	TSharedPtr<class FUICommandList> PluginCommands;
 };
