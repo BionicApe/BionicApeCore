@@ -36,13 +36,17 @@ public class BionicApeEditor : ModuleRules
 				"WorkspaceMenuStructure",
 				"Slate",
 				"SlateCore",
+				"ApplicationCore",
+				"InputCore",
+				"Json",
+				"EditorFramework",//Introduced in UE5
+				"ImageWrapper"
 			}
 			);
 
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"EditorFramework",//Introduced in UE5
                 "JsonUtilities",
 				"Json",
 				"ToolMenus",
