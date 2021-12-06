@@ -56,7 +56,7 @@ void FBaseEditorToolCustomization::CustomizeDetails(IDetailLayoutBuilder& Detail
 
 FReply FBaseEditorToolCustomization::ExecuteToolCommand(IDetailLayoutBuilder* DetailBuilder, UFunction* MethodToExecute)
 {
-	TArray<TWeakObjectPtr<UObject>> ObjectsBeingCustomized;
+TArray<TWeakObjectPtr<UObject>> ObjectsBeingCustomized;
 	DetailBuilder->GetObjectsBeingCustomized(ObjectsBeingCustomized);
 
 	for (auto WeakObject : ObjectsBeingCustomized)
