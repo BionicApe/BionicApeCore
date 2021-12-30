@@ -1,0 +1,98 @@
+// Created by Bionic Ape. All Rights Reserved.
+
+
+
+#include "EditActions/BAEditActions.h"
+#include "EditActions/BAEditActionsCommands.h"
+
+#include "EditActions/BAEditAction_MeshFromBlueprint.h"
+
+
+#include "LevelEditor.h"
+
+#define LOCTEXT_NAMESPACE "FBAEditActions"
+
+void FBAEditActions::Register()
+{
+	FBAEditActionsCommands::Register();
+	
+	CommandList = MakeShareable(new FUICommandList);
+
+	CommandList->MapAction(
+		FBAEditActionsCommands::Get().ExtractStaticMesh,
+		FExecuteAction::CreateStatic(&FBAEditAction_MeshFromBlueprint::ExecuteAction),
+		FCanExecuteAction()
+	);
+
+	//CreateButtonInContentBar();
+	ExtendEditMenu();
+}
+
+void FBAEditActions::ExtendEditMenu()
+{
+	MenuExtender = MakeShareable(new FExtender);
+	MenuExtender->AddMenuExtension(
+		"EditMain",
+		EExtensionHook::After,
+		CommandList.ToSharedRef(),
+		FMenuExtensionDelegate::CreateLambda(
+			[this](FMenuBuilder& MenuBuilder)
+			{
+				FSlateIcon MenuIcon = FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), "BionicApeEditor.Image");
+				MenuBuilder.AddSubMenu(
+					LOCTEXT("BAEditActions", "BAEditActions"),
+					LOCTEXT("BAEditActions", "BAEditActions"),
+					FNewMenuDelegate::CreateLambda(
+						[this](class FMenuBuilder& MenuBuilder)
+						{
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ExtractStaticMesh);
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ExtractStaticMesh);
+						}
+					),
+					false,
+				MenuIcon
+				);
+			}
+		)
+	);
+
+	FLevelEditorModule& LevelEditorModule = FModuleManager::GetModuleChecked<FLevelEditorModule>(TEXT("LevelEditor"));
+	LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
+
+}
+
+void FBAEditActions::CreateButtonInContentBar()
+{
+	UToolMenu* AssetsToolBar = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar.AssetsToolBar");
+	if (AssetsToolBar)
+	{
+		FToolMenuEntry ToolMenuEntry = FToolMenuEntry::InitToolBarButton(
+			"BAEditActions",
+			FUIAction(
+				FExecuteAction::CreateLambda(
+					[]()
+					{
+						
+					}
+				)
+			),
+			LOCTEXT("BAEditActions_Friendly", "BAEditActions"),
+			LOCTEXT("BAEditActions_Tooltip", "BAEditActions"),
+			FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), TEXT("BionicApeEditor.Image")));
+		ToolMenuEntry.StyleNameOverride = "CalloutToolbar";
+
+		FToolMenuSection& Section = AssetsToolBar->AddSection("Content");
+		Section.AddEntry(ToolMenuEntry);
+	}
+}
+
+void FBAEditActions::Unregister()
+{
+	FBAEditActionsCommands::Unregister();
+}
+
+void FBAEditActions::ExtractStaticMesh()
+{
+
+}
+#undef LOCTEXT_NAMESPACE
