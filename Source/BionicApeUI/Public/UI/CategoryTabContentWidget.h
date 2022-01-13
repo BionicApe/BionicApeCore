@@ -24,8 +24,10 @@ public:
 
 public:
 
-	virtual bool Initialize() override
-	{
-		return Super::Initialize() && ListViewWidget;
-	}
+	virtual bool Initialize() override;
+
+	
+	UFUNCTION(BlueprintCallable)
+	void SetListItems(const TArray<UObject*>& Items);
+
 };

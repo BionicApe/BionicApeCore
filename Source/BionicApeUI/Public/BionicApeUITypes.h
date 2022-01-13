@@ -7,6 +7,15 @@
 
 
 
+UENUM(BlueprintType)
+enum class EViewportRenderType : uint8
+{
+	DEFAULT_VIEWPORT,
+	BLEND_VIEWPORT,
+	MASKED_VIEWPORT,
+};
+
+
 
 //
 //USTRUCT(BlueprintType)

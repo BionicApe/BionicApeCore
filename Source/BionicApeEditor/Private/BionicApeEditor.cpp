@@ -18,18 +18,42 @@
 #include "ToolMenu.h"
 #include "ToolMenus.h"
 
-
 #include "Widgets/Docking/SDockTab.h"
 #include "Interfaces/IMainFrameModule.h"
 
 #include "BaseEditorTool.h"
 #include "Widgets/SWindow.h"
 #include "BaseEditorToolCustomization.h"
+#include "EditActions/BAEditActions.h"
 
 
 static const FName BionicApeEditorTabName("BionicApeEditorTab");
 
 #define LOCTEXT_NAMESPACE "BionicApeEditorModule"
+
+class FBionicApeEditorModule : public IBionicApeEditorModule
+{
+
+protected:
+
+	TSharedPtr<class FUICommandList> PluginCommands;
+
+	FBAEditActions BAEditActions;
+
+public:
+	/** IModuleInterface implementation */
+	virtual void StartupModule() override;
+	virtual void ShutdownModule() override;
+
+public:
+	//From Unreal Video
+	static void AddMenuCommands(FMenuBuilder& MenuBuilder);
+	static void AddToolbarCommands(FToolBarBuilder& ToolbarBuilder);
+	static void CreateToolListMenu(class FMenuBuilder& MenuBuilder);
+	static void TriggerTool(UClass* ToolClass);
+	static void OnToolWindowClosed(const TSharedRef<SWindow>& WindowBeingClosed, TWeakObjectPtr<UBaseEditorTool> ToolInstance);
+	//End From Unreal Video
+};
 
 void FBionicApeEditorModule::StartupModule()
 {
@@ -55,9 +79,11 @@ void FBionicApeEditorModule::StartupModule()
 		300*/
 		);
 	//End EditorMode
-	FBAMainMenuSystem::Register();
-
 	FBionicApeEditorCommands::Register();
+	
+	FBAMainMenuSystem::Register();
+	BAEditActions.Register();
+
 
 	PluginCommands = MakeShareable(new FUICommandList);
 	PluginCommands->MapAction
@@ -79,6 +105,8 @@ void FBionicApeEditorModule::StartupModule()
 	LevelEditorModule.GetMenuExtensibilityManager()->AddExtender(MenuExtender);
 
 	//End From Unreal Video
+
+
 }
 
 
@@ -92,7 +120,7 @@ void FBionicApeEditorModule::AddMenuCommands(FMenuBuilder& MenuBuilder)
 	FSlateIcon DocMenuIcon = FSlateIcon(FEditorStyle::GetStyleSetName(), "LevelEditor.BrowseDocumentation");
 	MenuBuilder.AddSubMenu(
 		LOCTEXT("BionicApeTools", "Bionic Ape Tools"),
-		LOCTEXT("DungeonArchitectToolTip", "Bionic Ape Tools"),
+		LOCTEXT("BionicApeTools", "Bionic Ape Tools"),
 		FNewMenuDelegate::CreateStatic(&FBionicApeEditorModule::CreateToolListMenu),
 		false,
 		DocMenuIcon

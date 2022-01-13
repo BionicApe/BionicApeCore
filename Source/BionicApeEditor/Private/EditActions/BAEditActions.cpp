@@ -6,6 +6,7 @@
 #include "EditActions/BAEditActionsCommands.h"
 
 #include "EditActions/BAEditAction_MeshFromBlueprint.h"
+#include "EditActions/BAEditAction_RenameSelectedActors.h"
 
 
 #include "LevelEditor.h"
@@ -21,6 +22,11 @@ void FBAEditActions::Register()
 	CommandList->MapAction(
 		FBAEditActionsCommands::Get().ExtractStaticMesh,
 		FExecuteAction::CreateStatic(&FBAEditAction_MeshFromBlueprint::ExecuteAction),
+		FCanExecuteAction()
+	);
+	CommandList->MapAction(
+		FBAEditActionsCommands::Get().RenameSelectedActors,
+		FExecuteAction::CreateStatic(&FBAEditAction_RenameSelectedActors::ExecuteAction),
 		FCanExecuteAction()
 	);
 
@@ -46,7 +52,7 @@ void FBAEditActions::ExtendEditMenu()
 						[this](class FMenuBuilder& MenuBuilder)
 						{
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ExtractStaticMesh);
-							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ExtractStaticMesh);
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().RenameSelectedActors);
 						}
 					),
 					false,

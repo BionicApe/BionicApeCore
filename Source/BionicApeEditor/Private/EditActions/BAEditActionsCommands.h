@@ -21,4 +21,6 @@ public:
 public:
 
 	TSharedPtr<FUICommandInfo> ExtractStaticMesh;
+	
+	TSharedPtr<FUICommandInfo> RenameSelectedActors;
 };

@@ -20,7 +20,7 @@
 
 #define LOCTEXT_NAMESPACE "MainMenuSystem"
 
-namespace
+namespace BAMainMenu
 {
 	const FName BAMainMenuSystemWindowID = FName(TEXT("BAMainMenuSystem"));
 
@@ -37,8 +37,8 @@ namespace
 void FBAMainMenuSystem::Register()
 {
 	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
-		BAMainMenuSystemWindowID,
-		FOnSpawnTab::CreateStatic(&SpawnNomadTab))
+		BAMainMenu::BAMainMenuSystemWindowID,
+		FOnSpawnTab::CreateStatic(&BAMainMenu::SpawnNomadTab))
 			.SetDisplayName(LOCTEXT("TabTitle", "Bionic Ape Editor Tools"))
 			.SetTooltipText(LOCTEXT("TooltipText", "Access all Bionic Ape Editor Tools"))
 			.SetGroup(WorkspaceMenu::GetMenuStructure().GetLevelEditorCategory())
@@ -63,12 +63,12 @@ void FBAMainMenuSystem::Register()
 
 void FBAMainMenuSystem::Unregister()
 {
-	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(BAMainMenuSystemWindowID);
+	FGlobalTabmanager::Get()->UnregisterNomadTabSpawner(BAMainMenu::BAMainMenuSystemWindowID);
 }
 
 void FBAMainMenuSystem::Launch()
 {
-	FGlobalTabmanager::Get()->TryInvokeTab(BAMainMenuSystemWindowID);
+	FGlobalTabmanager::Get()->TryInvokeTab(BAMainMenu::BAMainMenuSystemWindowID);
 }
 
 #undef LOCTEXT_NAMESPACE
