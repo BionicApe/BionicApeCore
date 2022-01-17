@@ -11,24 +11,18 @@
 
 #include "Kismet2/SClassPickerDialog.h"
 
-#include "BAEditorStatics.h"
-
 #include "Misc/MessageDialog.h"
 
-#include "Components/PointLightComponent.h"
-#include "Components/DirectionalLightComponent.h"
-#include "Components/SpotLightComponent.h"
-#include "Components/RectLightComponent.h"
+#include "Camera/CameraActor.h"
 
-#include "Engine/DirectionalLight.h"
 #include "Engine/Light.h"
-#include "Engine/PointLight.h"
-#include "Engine/RectLight.h"
+#include "Engine/LevelScriptActor.h"
 #include "Engine/ReflectionCapture.h"
-#include "Engine/SpotLight.h"
 #include "Engine/StaticMeshActor.h"
 
 #include "Editor/EditorEngine.h"
+#include "Editor.h"
+#include "BAEditActionsLib.h"
 
 const TSet<FString> FBAEditAction_MeshFromBlueprint::IgnoreClassNames =
 {
@@ -85,11 +79,9 @@ public:
 #define LOCTEXT_NAMESPACE "BAEditAction_MeshFromBlueprint"
 
 
-
-
 void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 {
-	UWorld* World = UBAEditorStatics::GetEditorMainWorld();
+	UWorld* World = GEditor->GetEditorWorldContext().World();
 	if (!World)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Not valid World"));
@@ -134,7 +126,7 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 				for (TActorIterator<AActor> ChosenActorIt(World, Actor->GetClass()); ChosenActorIt; ++ChosenActorIt)
 				{
 					AActor* ChosenActor = *ChosenActorIt;
-					FBAEditAction_MeshFromBlueprint::SpawnActorsFromComponents(ChosenActor, World, ChosenActor->GetClass());
+					FBAEditActionsLib::SpawnActorsFromComponents(ChosenActor, World, ChosenActor->GetClass());
 					if (bDeleteOriginal)
 					{
 						ActorsToDestroy.Add(ChosenActor);
@@ -170,7 +162,7 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 			for (TActorIterator<AActor> It(World, ChosenClass); It; ++It)
 			{
 				AActor* Actor = *It;
-				FBAEditAction_MeshFromBlueprint::SpawnActorsFromComponents(Actor, World, ChosenClass);
+				FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, ChosenClass);
 
 				if (bDeleteOriginal)
 				{
@@ -184,101 +176,6 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 }
 
 
-
-void FBAEditAction_MeshFromBlueprint::SpawnActorsFromComponents(AActor* Actor, UWorld* World, UClass* ChosenClass)
-{
-	if (Actor)
-	{
-		for (UActorComponent* Comp : Actor->GetComponents())
-		{
-			if (UStaticMeshComponent* StaticMeshComp = Cast<UStaticMeshComponent>(Comp))
-			{
-				if (UStaticMesh* StaticMesh = StaticMeshComp->GetStaticMesh())
-				{
-					AStaticMeshActor* MeshActor = World->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), StaticMeshComp->GetComponentTransform());
-					MeshActor->GetStaticMeshComponent()->SetStaticMesh(StaticMesh);
-					MeshActor->SetFolderPath(ChosenClass->GetFName());
-					FActorLabelUtilities::SetActorLabelUnique(MeshActor, StaticMesh->GetName());
-
-					for (int32 i = 0; i < StaticMeshComp->GetNumMaterials(); i++)
-					{
-						if (UMaterialInterface* Material = StaticMeshComp->GetMaterial(i))
-						{
-							if (!Material->IsA<UMaterialInstanceDynamic>())//We don't set the MID since we don't know their origin
-							{
-								MeshActor->GetStaticMeshComponent()->SetMaterial(i, Material);
-							}
-						}
-					}
-				}
-			}
-			else if (ULightComponent* LightComp = Cast<ULightComponent>(Comp))
-			{
-				ALight* LightActor = nullptr;
-
-				if (LightComp->IsA<UDirectionalLightComponent>())
-				{
-					LightActor = World->SpawnActor<ADirectionalLight>(ADirectionalLight::StaticClass(), LightComp->GetComponentTransform());
-				}
-				else if (LightComp->IsA<USpotLightComponent>())//WARNING: USpotLightComponent is a subclass of UPointLightComponent, so it must be tested first
-				{
-					LightActor = World->SpawnActor<ASpotLight>(ASpotLight::StaticClass(), LightComp->GetComponentTransform());
-
-					USpotLightComponent* SpotLightComponent = Cast<USpotLightComponent>(LightActor->GetLightComponent());
-					USpotLightComponent* OriginSpotLightComp = Cast<USpotLightComponent>(LightComp);
-					SpotLightComponent->SetAttenuationRadius(OriginSpotLightComp->AttenuationRadius);
-					SpotLightComponent->SetInnerConeAngle(OriginSpotLightComp->InnerConeAngle);
-					SpotLightComponent->SetOuterConeAngle(OriginSpotLightComp->OuterConeAngle);
-					SpotLightComponent->SetIntensityUnits(OriginSpotLightComp->IntensityUnits);
-
-				}
-				else if (LightComp->IsA<UPointLightComponent>())
-				{
-					LightActor = World->SpawnActor<APointLight>(APointLight::StaticClass(), LightComp->GetComponentTransform());
-
-					UPointLightComponent* PointLightComponent = Cast<UPointLightComponent>(LightActor->GetLightComponent());
-					UPointLightComponent* OriginPointLightComp = Cast<UPointLightComponent>(LightComp);
-					PointLightComponent->SetAttenuationRadius(OriginPointLightComp->AttenuationRadius);
-					PointLightComponent->SetIntensityUnits(OriginPointLightComp->IntensityUnits);
-
-				}
-				else if (LightComp->IsA<URectLightComponent>())
-				{
-					LightActor = World->SpawnActor<ARectLight>(ARectLight::StaticClass(), LightComp->GetComponentTransform());
-				}
-				else
-				{
-					UE_LOG(LogTemp, Log, TEXT("Class not found for light component"));
-					continue;
-				}
-
-				ULightComponent* NewLightComponent = LightActor->GetLightComponent();
-				NewLightComponent->SetIntensity(LightComp->Intensity);
-				NewLightComponent->SetLightColor(LightComp->GetLightColor());
-
-
-				//TODO: IMPORTANT, if we get this working we don't need the above
-				//StaticDuplicateObject() is for duplicating the objects.
-				//UEngine::FCopyPropertiesForUnrelatedObjectsParams CopyParams;
-				//CopyParams.bNotifyObjectReplacement = false;
-				//CopyParams.bPreserveRootComponent = false;
-				//UEngine::CopyPropertiesForUnrelatedObjects(LightComp, LightActor->GetLightComponent(), CopyParams);
-
-				//Todo: this doesn't work, it should work, but it doesn't. So That's why we copy the most representative values.
-				//for (TFieldIterator<FProperty> PropIt(LightComp->StaticClass()); PropIt; ++PropIt)
-				//{
-				//	FProperty* Property = *PropIt;
-
-				//	if (!Property->IsA<FObjectProperty>())
-				//	{
-				//		EditorUtilities::CopySingleProperty(LightComp, LightActor->GetLightComponent(), Property);
-				//	}
-				//}
-				//End Important TODO
-			}
-		}
-	}
-}
 bool FBAEditAction_MeshFromBlueprint::IgnoreActor(AActor* Actor)
 {
 	if (IgnoreClassNames.Contains(Actor->GetClass()->GetName()))

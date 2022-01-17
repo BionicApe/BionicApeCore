@@ -11,6 +11,11 @@
 
 #include "LevelEditor.h"
 
+#include "ToolMenu.h"
+#include "ToolMenus.h"
+#include "BAEditAction_ActorsFromSelection.h"
+#include "BAEditAction_CountSelectedActors.h"
+
 #define LOCTEXT_NAMESPACE "FBAEditActions"
 
 void FBAEditActions::Register()
@@ -25,10 +30,21 @@ void FBAEditActions::Register()
 		FCanExecuteAction()
 	);
 	CommandList->MapAction(
+		FBAEditActionsCommands::Get().ActorsFromSelection,
+		FExecuteAction::CreateStatic(&FBAEditAction_ActorsFromSelection::ExecuteAction),
+		FCanExecuteAction()
+	);
+	CommandList->MapAction(
 		FBAEditActionsCommands::Get().RenameSelectedActors,
 		FExecuteAction::CreateStatic(&FBAEditAction_RenameSelectedActors::ExecuteAction),
 		FCanExecuteAction()
 	);
+	CommandList->MapAction(
+		FBAEditActionsCommands::Get().CountSelectedActors,
+		FExecuteAction::CreateStatic(&FBAEditAction_CountSelectedActors::ExecuteAction),
+		FCanExecuteAction()
+	);
+
 
 	//CreateButtonInContentBar();
 	ExtendEditMenu();
@@ -44,7 +60,7 @@ void FBAEditActions::ExtendEditMenu()
 		FMenuExtensionDelegate::CreateLambda(
 			[this](FMenuBuilder& MenuBuilder)
 			{
-				FSlateIcon MenuIcon = FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), "BionicApeEditor.Image");
+				FSlateIcon MenuIcon = FSlateIcon(FPltSimEditorStyle::GetStyleSetName(), "PltSimEditor.Image");
 				MenuBuilder.AddSubMenu(
 					LOCTEXT("BAEditActions", "BAEditActions"),
 					LOCTEXT("BAEditActions", "BAEditActions"),
@@ -53,6 +69,8 @@ void FBAEditActions::ExtendEditMenu()
 						{
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ExtractStaticMesh);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().RenameSelectedActors);
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ActorsFromSelection);
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().CountSelectedActors);
 						}
 					),
 					false,
@@ -84,8 +102,8 @@ void FBAEditActions::CreateButtonInContentBar()
 			),
 			LOCTEXT("BAEditActions_Friendly", "BAEditActions"),
 			LOCTEXT("BAEditActions_Tooltip", "BAEditActions"),
-			FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), TEXT("BionicApeEditor.Image")));
-		ToolMenuEntry.StyleNameOverride = "CalloutToolbar";
+			FSlateIcon(FPltSimEditorStyle::GetStyleSetName(), TEXT("PltSimEditor.Image")));
+		//ToolMenuEntry.StyleNameOverride = "CalloutToolbar";
 
 		FToolMenuSection& Section = AssetsToolBar->AddSection("Content");
 		Section.AddEntry(ToolMenuEntry);

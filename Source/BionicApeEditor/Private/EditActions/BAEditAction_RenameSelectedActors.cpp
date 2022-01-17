@@ -2,8 +2,11 @@
 
 #include "EditActions/BAEditAction_RenameSelectedActors.h"
 #include "Dialogs/Dialogs.h"
-#include "Selection.h"
+#include "Engine/Selection.h"
 #include "Editor/EditorEngine.h"
+
+#include "Widgets/Input/SEditableText.h"
+#include "Editor.h"
 
 #define LOCTEXT_NAMESPACE "BAEditAction_RenameSelectedActors"
 
