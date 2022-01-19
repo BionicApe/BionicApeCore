@@ -53,6 +53,7 @@ void FBAEditAction_ActorsFromSelection::ExecuteAction()
 
 	bool const bDeleteOriginal = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("DeleteOriginal", "Do you want to delete original Actor?"));
 	bool const bSpawnOneActorPerComponent = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("SpawnOneActorPerComponent ", "Do you want to Spawn one Actor per Component?"));
+	bool const bUseLevelNameAsRootFolder = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("Use Level as Folder ", "Use level name as Root Folder?"));
 
 	USelection* SelectedActors = GEditor->GetSelectedActors();
 
@@ -67,7 +68,7 @@ void FBAEditAction_ActorsFromSelection::ExecuteAction()
 			continue;
 		}
 
-		FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, Actor->GetClass(), bSpawnOneActorPerComponent);
+		FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, Actor->GetClass(), bSpawnOneActorPerComponent, bUseLevelNameAsRootFolder);
 
 		if (bDeleteOriginal)
 		{

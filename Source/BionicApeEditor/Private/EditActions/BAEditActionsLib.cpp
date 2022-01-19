@@ -22,8 +22,28 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "UObject/UObjectGlobals.h"
 
+#include "GameFramework/Actor.h"
 
-bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, UClass* ChosenClass, bool const bSpawnOneActorPerComp)
+
+
+FName FBAEditActionsLib::CreateFolderPath(AActor* Actor, UClass* ChosenClass, bool const bUseLevelNameAsRootFolder /*= true*/)
+{
+	return bUseLevelNameAsRootFolder ? *FString::Printf(TEXT("%s/%s"), *Actor->GetLevel()->GetOuter()->GetName(), *ChosenClass->GetName()) : *ChosenClass->GetName();
+}
+
+bool FBAEditActionsLib::HasConstructorComponents(AActor* Actor)
+{
+	for (UActorComponent* Comp : Actor->GetComponents())
+	{
+		if (Comp->CreationMethod == EComponentCreationMethod::UserConstructionScript)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, UClass* ChosenClass, bool const bSpawnOneActorPerComp, bool const bUseLevelNameAsRootFolder)
 {
 	if (!Actor || !World || !ChosenClass)
 	{
@@ -37,8 +57,11 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 	{
 		//Spawn only one Actor
 		SpawnedActor = World->SpawnActor<AActor>(AActor::StaticClass(), Actor->GetTransform());
-		SpawnedActor->SetFolderPath(ChosenClass->GetFName());
+		SpawnedActor->SetFolderPath(FBAEditActionsLib::CreateFolderPath(Actor, ChosenClass, bUseLevelNameAsRootFolder));
 		FActorLabelUtilities::SetActorLabelUnique(SpawnedActor, ChosenClass->GetName());
+
+		USceneComponent* RootComponent = Actor->GetRootComponent();
+		RootComponent->SetMobility(Actor->GetRootComponent()->Mobility);
 	}
 
 	for (UActorComponent* Comp : Actor->GetComponents())
@@ -52,22 +75,25 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 
 				if (bSpawnOneActorPerComp)
 				{
+
 					AStaticMeshActor* MeshActor = World->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), OriginalStaticMeshComp->GetComponentTransform());
-					MeshActor->SetFolderPath(ChosenClass->GetFName());
+					MeshActor->SetFolderPath(FBAEditActionsLib::CreateFolderPath(Actor, ChosenClass, bUseLevelNameAsRootFolder));
 					FActorLabelUtilities::SetActorLabelUnique(MeshActor, StaticMesh->GetName());
 					CreatedComp = MeshActor->GetStaticMeshComponent();
 				}
 				else
 				{
 					CreatedComp = NewObject<UStaticMeshComponent>(SpawnedActor);
-					CreatedComp->CreationMethod = EComponentCreationMethod::Instance;
+					//CreatedComp->CreationMethod = EComponentCreationMethod::Instance;
+					SpawnedActor->AddInstanceComponent(CreatedComp);
 					CreatedComp->SetWorldTransform(OriginalStaticMeshComp->GetComponentTransform());
-					CreatedComp->AttachToComponent(SpawnedActor->GetRootComponent(),FAttachmentTransformRules::KeepWorldTransform);
+					CreatedComp->AttachToComponent(SpawnedActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+					CreatedComp->OnComponentCreated();
 					CreatedComp->RegisterComponent();
 				}
 
 				CreatedComp->SetStaticMesh(StaticMesh);
-
+				CreatedComp->SetMobility(OriginalStaticMeshComp->Mobility);
 
 				for (int32 i = 0; i < OriginalStaticMeshComp->GetNumMaterials(); i++)
 				{
@@ -81,7 +107,7 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 				}
 			}
 		}
-		else if (ULightComponent* LightComp = Cast<ULightComponent>(Comp))
+		else if (ULightComponent* OriginalLightComp = Cast<ULightComponent>(Comp))
 		{
 			ULightComponent* NewLightComponent = nullptr;
 
@@ -89,21 +115,21 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 			{
 				ALight* LightActor = nullptr;
 
-				if (LightComp->IsA<UDirectionalLightComponent>())
+				if (OriginalLightComp->IsA<UDirectionalLightComponent>())
 				{
-					LightActor = World->SpawnActor<ADirectionalLight>(ADirectionalLight::StaticClass(), LightComp->GetComponentTransform());
+					LightActor = World->SpawnActor<ADirectionalLight>(ADirectionalLight::StaticClass(), OriginalLightComp->GetComponentTransform());
 				}
-				else if (LightComp->IsA<USpotLightComponent>())//WARNING: USpotLightComponent is a subclass of UPointLightComponent, so it must be tested first
+				else if (OriginalLightComp->IsA<USpotLightComponent>())//WARNING: USpotLightComponent is a subclass of UPointLightComponent, so it must be tested first
 				{
-					LightActor = World->SpawnActor<ASpotLight>(ASpotLight::StaticClass(), LightComp->GetComponentTransform());
+					LightActor = World->SpawnActor<ASpotLight>(ASpotLight::StaticClass(), OriginalLightComp->GetComponentTransform());
 				}
-				else if (LightComp->IsA<UPointLightComponent>())
+				else if (OriginalLightComp->IsA<UPointLightComponent>())
 				{
-					LightActor = World->SpawnActor<APointLight>(APointLight::StaticClass(), LightComp->GetComponentTransform());
+					LightActor = World->SpawnActor<APointLight>(APointLight::StaticClass(), OriginalLightComp->GetComponentTransform());
 				}
-				else if (LightComp->IsA<URectLightComponent>())
+				else if (OriginalLightComp->IsA<URectLightComponent>())
 				{
-					LightActor = World->SpawnActor<ARectLight>(ARectLight::StaticClass(), LightComp->GetComponentTransform());
+					LightActor = World->SpawnActor<ARectLight>(ARectLight::StaticClass(), OriginalLightComp->GetComponentTransform());
 				}
 				else
 				{
@@ -111,47 +137,45 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 					continue;
 				}
 
-				LightActor->SetFolderPath(ChosenClass->GetFName());
+				LightActor->SetFolderPath(FBAEditActionsLib::CreateFolderPath(Actor, ChosenClass, bUseLevelNameAsRootFolder));
 				FActorLabelUtilities::SetActorLabelUnique(LightActor, ChosenClass->GetName());
 
 				NewLightComponent = LightActor->GetLightComponent();
 			}
 			else
 			{
-
-
-				NewLightComponent = NewObject<ULightComponent>(SpawnedActor, LightComp->GetClass());
-				NewLightComponent->CreationMethod = EComponentCreationMethod::Instance;
-				NewLightComponent->SetWorldTransform(LightComp->GetComponentTransform());
+				NewLightComponent = NewObject<ULightComponent>(SpawnedActor, OriginalLightComp->GetClass());
+				//NewLightComponent->CreationMethod = EComponentCreationMethod::Instance;
+				SpawnedActor->AddInstanceComponent(NewLightComponent);
+				NewLightComponent->SetWorldTransform(OriginalLightComp->GetComponentTransform());
 				NewLightComponent->AttachToComponent(SpawnedActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+				NewLightComponent->OnComponentCreated();
 				NewLightComponent->RegisterComponent();
 			}
 
 			{//Set light values
-				if (LightComp->IsA<USpotLightComponent>())//WARNING: USpotLightComponent is a subclass of UPointLightComponent, so it must be tested first
+				NewLightComponent->SetMobility(OriginalLightComp->Mobility);
+				NewLightComponent->SetIntensity(OriginalLightComp->Intensity);
+				NewLightComponent->SetLightColor(OriginalLightComp->GetLightColor());
+
+				if (OriginalLightComp->IsA<USpotLightComponent>())//WARNING: USpotLightComponent is a subclass of UPointLightComponent, so it must be tested first
 				{
-					USpotLightComponent* OriginSpotLightComp = Cast<USpotLightComponent>(LightComp);
+					USpotLightComponent* OriginSpotLightComp = Cast<USpotLightComponent>(OriginalLightComp);
 					USpotLightComponent* SpotLightComponent = Cast<USpotLightComponent>(NewLightComponent);
 
 					SpotLightComponent->SetAttenuationRadius(OriginSpotLightComp->AttenuationRadius);
 					SpotLightComponent->SetInnerConeAngle(OriginSpotLightComp->InnerConeAngle);
 					SpotLightComponent->SetOuterConeAngle(OriginSpotLightComp->OuterConeAngle);
 					SpotLightComponent->SetIntensityUnits(OriginSpotLightComp->IntensityUnits);
-
 				}
-				else if (LightComp->IsA<UPointLightComponent>())
+				else if (OriginalLightComp->IsA<UPointLightComponent>())
 				{
 					UPointLightComponent* PointLightComponent = Cast<UPointLightComponent>(NewLightComponent);
-					UPointLightComponent* OriginPointLightComp = Cast<UPointLightComponent>(LightComp);
+					UPointLightComponent* OriginPointLightComp = Cast<UPointLightComponent>(OriginalLightComp);
 					PointLightComponent->SetAttenuationRadius(OriginPointLightComp->AttenuationRadius);
 					PointLightComponent->SetIntensityUnits(OriginPointLightComp->IntensityUnits);
-
 				}
-
-				NewLightComponent->SetIntensity(LightComp->Intensity);
-				NewLightComponent->SetLightColor(LightComp->GetLightColor());
 			}
-
 
 			//TODO: IMPORTANT, if we get this working we don't need the above
 			//StaticDuplicateObject() is for duplicating the objects.
@@ -173,6 +197,6 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 			//End Important TODO
 		}
 	}
-	
+
 	return true;
 }

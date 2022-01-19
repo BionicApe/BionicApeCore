@@ -13,20 +13,10 @@
 
 void FBAEditAction_CountSelectedActors::ExecuteAction()
 {
-
-	TSharedRef<SEditableText> EditableText = SNew(SEditableText).Text(FText::FromString("NewName")).IsReadOnly(false);
-	
-	SGenericDialogWidget::OpenDialog(
-		LOCTEXT("FBAEditAction_CountSelectedActors", "Count Selected Actors"), 
-		EditableText,
-		SGenericDialogWidget::FArguments(), 
-		true
-	);
-
 	USelection* SelectedActors = GEditor->GetSelectedActors();
 
 	FMessageDialog::Open(
-		EAppMsgType::YesNo,
+		EAppMsgType::Ok,
 		FText::Format(LOCTEXT("ActorsCount", "Selected Actors: '{0}'"), FText::AsNumber(SelectedActors->Num()))
 	);	
 }

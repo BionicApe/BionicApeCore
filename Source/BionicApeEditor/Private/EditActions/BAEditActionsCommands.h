@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Framework/Commands/Commands.h"
-#include "PltSimEditorStyle.h"
+#include "BionicApeEditorStyle.h"
 #include "Tools/InteractiveToolsCommands.h"
 
 class FBAEditActionsCommands : public TCommands<FBAEditActionsCommands>
@@ -12,7 +12,7 @@ class FBAEditActionsCommands : public TCommands<FBAEditActionsCommands>
 public:
 
 	FBAEditActionsCommands()
-		: TCommands<FBAEditActionsCommands>(TEXT("BAEditActions"), NSLOCTEXT("Contexts", "BAEditActions", "BAEditActions"), NAME_None, FPltSimEditorStyle::GetStyleSetName())
+		: TCommands<FBAEditActionsCommands>(TEXT("BAEditActions"), NSLOCTEXT("Contexts", "BAEditActions", "BAEditActions"), NAME_None, FBionicApeEditorStyle::GetStyleSetName())
 	{
 	}
 
@@ -24,4 +24,6 @@ public:
 	TSharedPtr<FUICommandInfo> ActorsFromSelection;
 	TSharedPtr<FUICommandInfo> RenameSelectedActors;
 	TSharedPtr<FUICommandInfo> CountSelectedActors;
+	TSharedPtr<FUICommandInfo> ForceMobility;
+	TSharedPtr<FUICommandInfo> HasConstructorComponents;
 };

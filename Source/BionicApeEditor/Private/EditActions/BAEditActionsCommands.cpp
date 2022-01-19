@@ -3,7 +3,7 @@
 #include "BAEditActionsCommands.h"
 #include "EditorStyleSet.h"
 
-#define LOCTEXT_NAMESPACE "PltSimEditorModule"
+#define LOCTEXT_NAMESPACE "BAEditActionsCommands"
 
 void FBAEditActionsCommands::RegisterCommands()
 {
@@ -11,6 +11,8 @@ void FBAEditActionsCommands::RegisterCommands()
 	UI_COMMAND(ActorsFromSelection, "Create Actors From Selection", "Create Actors from the selection extracting components and adding them to the newly created Actor", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(RenameSelectedActors, "Rename Selected Actors", "Rename Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(CountSelectedActors, "Count Selected Actors", "Count Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
+	UI_COMMAND(ForceMobility, "Force Mobility", "Force Mobility to Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
+	UI_COMMAND(HasConstructorComponents, "HasConstructorComponents", "Has Constructor Components", EUserInterfaceActionType::Button, FInputGesture());
 }
 
 #undef LOCTEXT_NAMESPACE

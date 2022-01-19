@@ -42,7 +42,12 @@ const TSet<FString> FBAEditAction_MeshFromBlueprint::IgnoreClassNames =
 	"AtmosphericFog",
 	"BP_Sky_Sphere_C",
 	"SkyLight",
-	"BASpawnerActor"
+	"BASpawnerActor",
+	"Emitter",
+	"GroupActor",
+	"ExponentialHeightFog",
+	"PostProcessVolume",
+
 };
 
 const TSet<UClass*> FBAEditAction_MeshFromBlueprint::IgnoreClasses =
@@ -89,8 +94,12 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 	}
 
 	GEditor->BeginTransaction(LOCTEXT("BAEditAction_MeshFromBlueprint", "Create Mesh Actors from Actor Class"));
-
+	
+	bool const bSpawnOneActorPerComponent = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("SpawnOneActorPerComponent ", "Do you want to Spawn one Actor per Component?"));
+	bool const bUseLevelNameAsRootFolder = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("Use Level as Folder ", "Use level name as Root Folder?"));
 	bool const bIterateAllActors = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("IterateAllActors", "Do you want to iterate all actors?"));
+
+
 	if (bIterateAllActors)
 	{
 		TSet<UClass*> ClassesAlreadySeen;
@@ -126,7 +135,7 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 				for (TActorIterator<AActor> ChosenActorIt(World, Actor->GetClass()); ChosenActorIt; ++ChosenActorIt)
 				{
 					AActor* ChosenActor = *ChosenActorIt;
-					FBAEditActionsLib::SpawnActorsFromComponents(ChosenActor, World, ChosenActor->GetClass());
+					FBAEditActionsLib::SpawnActorsFromComponents(ChosenActor, World, ChosenActor->GetClass(), bSpawnOneActorPerComponent, bUseLevelNameAsRootFolder);
 					if (bDeleteOriginal)
 					{
 						ActorsToDestroy.Add(ChosenActor);
@@ -162,7 +171,7 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 			for (TActorIterator<AActor> It(World, ChosenClass); It; ++It)
 			{
 				AActor* Actor = *It;
-				FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, ChosenClass);
+				FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, ChosenClass, bSpawnOneActorPerComponent, bUseLevelNameAsRootFolder);
 
 				if (bDeleteOriginal)
 				{
