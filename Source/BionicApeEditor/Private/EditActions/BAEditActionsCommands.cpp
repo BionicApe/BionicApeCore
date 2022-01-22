@@ -13,6 +13,7 @@ void FBAEditActionsCommands::RegisterCommands()
 	UI_COMMAND(CountSelectedActors, "Count Selected Actors", "Count Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(ForceMobility, "Force Mobility", "Force Mobility to Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(HasConstructorComponents, "HasConstructorComponents", "Has Constructor Components", EUserInterfaceActionType::Button, FInputGesture());
+	UI_COMMAND(MoveActorsToLevelFolder, "MoveActorsToLevelFolder", "Move Actors To Level Folder", EUserInterfaceActionType::Button, FInputGesture());
 }
 
 #undef LOCTEXT_NAMESPACE

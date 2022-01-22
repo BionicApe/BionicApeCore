@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ExtractOptions.h"
 
 class AActor;
 class UWorld;
@@ -20,5 +21,4 @@ public:
 	static void SpawnActorsFromComponents(AActor* Actor, UWorld* World, UClass* ChosenClass);
 
 	static bool IgnoreActor(AActor* Actor);
-
 };

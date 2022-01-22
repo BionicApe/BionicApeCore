@@ -8,6 +8,8 @@
 #include "Widgets/Input/SEditableText.h"
 #include "Editor.h"
 
+#include "EditActions/BAEditActionsLib.h"
+
 #define LOCTEXT_NAMESPACE "BAEditAction_HasConstructorComponents"
 
 

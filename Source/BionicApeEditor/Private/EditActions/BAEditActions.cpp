@@ -17,6 +17,7 @@
 #include "BAEditAction_CountSelectedActors.h"
 #include "BAEditAction_ForceMobility.h"
 #include "BAEditAction_HasConstructorComponents.h"
+#include "BAEditAction_MoveActorsToLevelFolder.h"
 
 #define LOCTEXT_NAMESPACE "FBAEditActions"
 
@@ -56,6 +57,11 @@ void FBAEditActions::Register()
 		FExecuteAction::CreateStatic(&FBAEditAction_HasConstructorComponents::ExecuteAction),
 		FCanExecuteAction()
 	);
+	CommandList->MapAction(
+		FBAEditActionsCommands::Get().MoveActorsToLevelFolder,
+		FExecuteAction::CreateStatic(&FBAEditAction_MoveActorsToLevelFolder::ExecuteAction),
+		FCanExecuteAction()
+	);
 
 
 	//CreateButtonInContentBar();
@@ -85,10 +91,11 @@ void FBAEditActions::ExtendEditMenu()
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().CountSelectedActors);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ForceMobility);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().HasConstructorComponents);
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().MoveActorsToLevelFolder);
 						}
 					),
 					false,
-				MenuIcon
+					MenuIcon
 				);
 			}
 		)

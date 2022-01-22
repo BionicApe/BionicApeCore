@@ -1,194 +1,178 @@
 // Created by Bionic Ape. All Rights Reserved.
 
-#include "EditActions/SMeshFromBlueprints.h"
+#include "EditActions/SMeshFromBlueprint.h"
+#include "Widgets/Input/SCheckBox.h"
+#include "Editor/EditorEngine.h"
+#include "Widgets/Layout/SUniformGridPanel.h"
+#include "Widgets/Text/STextBlock.h"
 
 #define LOCTEXT_NAMESPACE "SMeshFromBlueprints"
 
 
-
 void SMeshFromBlueprint::Construct(const FArguments& InArgs)
 {
-	AllowCancelClick = true;
-
 	SWindow::Construct(
 		SWindow::FArguments()
-			.Title(LOCTEXT("SMeshFromBlueprintsTitle", "Extract Options"))
-			.SupportsMinimize(false)
-			.SupportsMaximize(false)
-			.ClientSize(FVector2D(900, 500))
-			[
-				SNew(SVerticalBox)
-				+ SVerticalBox::Slot() // Add user input block
-				.Padding(2)
-				[
-					SNew(SBorder)
-					.BorderImage(FEditorStyle::GetBrush("ToolPanel.GroupBorder"))
-				[
-					SNew(SVerticalBox)
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					[
-						SNew(STextBlock)
-						.Text(LOCTEXT("SelectPath", "Select a Skeletal Mesh or Skeleton for source pose (or none for current pose)"))
-						.Font(FCoreStyle::GetDefaultFontStyle("Regular", 14))
-					]
-					+ SVerticalBox::Slot()
-					.MaxHeight(450)
-					.Padding(3)
-					[
-						ContentBrowserModule.Get().CreateAssetPicker(AssetPickerConfig)
-					]
-					+ SVerticalBox::Slot()
-					.AutoHeight()
-					[
-						SNew(SSeparator)
-					]
-				]
-			]
-	+ SVerticalBox::Slot()
-		.AutoHeight()
-		.HAlign(HAlign_Fill)
-		.Padding(5)
+		.Title(LOCTEXT("SMeshFromBlueprintsTitle", "Extract Options"))
+		.SupportsMinimize(false)
+		.SupportsMaximize(false)
+		.ClientSize(FVector2D(900, 500))
 		[
-			SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot()
-			.FillWidth(1)
+			SNew(SVerticalBox)
+			+ SVerticalBox::Slot()
 			[
 				SNew(SCheckBox)
-				.IsChecked(this, &SCopyBonesLocationDialog::IsRotationsChecked)
-				.IsEnabled_Lambda([this]() { return SelectedOptions.bUpdateReferenceSkeleton; })
-				.ToolTipText(LOCTEXT("UpdateRotationsCheckboxTooltip", "Updates the bone rotations when updating the reference skeleton"))
-				.OnCheckStateChanged(this, &SCopyBonesLocationDialog::OnRotationCheckStateChange)
+				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bSpawnOneActorPerComponent /*, ExtractOptions.bSpawnOneActorPerComponent*/)
+				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bSpawnOneActorPerComponent)
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_SpawnOneActorPerComponent", "Spawns One Actor Per Component"))
 				.Content()
-			[
-				SNew(STextBlock)
-				.Text(LOCTEXT("UpdateRefSkeletonRotation", "Rotations"))
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_SpawnOneActorPerComponent", "Spawn One Actor per Component"))
+				]
 			]
-		]
-	+ SHorizontalBox::Slot()
-		.FillWidth(1)
-		[
-			SNew(SCheckBox)
-			.IsChecked(this, &SCopyBonesLocationDialog::IsTranslationChecked)
-		.IsEnabled_Lambda([this]() { return SelectedOptions.bUpdateReferenceSkeleton; })
-		.ToolTipText(LOCTEXT("UpdateLocationCheckboxTooltip", "Updates the bone translations when updating the reference skeleton"))
-		.OnCheckStateChanged(this, &SCopyBonesLocationDialog::OnTranslationCheckStateChange)
-		.Content()
-		[
-			SNew(STextBlock)
-			.Text(LOCTEXT("UpdateRefSkeletonLocation", "Location"))
-		]
-		]
-	+ SHorizontalBox::Slot()
-		.FillWidth(1)
-		[
-			SNew(SCheckBox)
-			.IsChecked(this, &SCopyBonesLocationDialog::IsScaleChecked)
-		.IsEnabled_Lambda([this]() { return SelectedOptions.bUpdateReferenceSkeleton; })
-		.ToolTipText(LOCTEXT("UpdateLocationCheckboxTooltip", "Updates the bone scales when updating the reference skeleton"))
-		.OnCheckStateChanged(this, &SCopyBonesLocationDialog::OnScaleCheckStateChange)
-		.Content()
-		[
-			SNew(STextBlock)
-			.Text(LOCTEXT("UpdateRefSkeletonScale", "Scale"))
-		]
-		]
-		]
-	+ SVerticalBox::Slot()
-		.AutoHeight()
-		.HAlign(HAlign_Fill)
-		.Padding(5)
-		[
-			SNew(SHorizontalBox)
-			+ SHorizontalBox::Slot()
-		.FillWidth(1)
-		[
-			SNew(SCheckBox)
-			.Style(&FEditorStyle::GetWidgetStyle<FCheckBoxStyle>("Menu.RadioButton"))
-		.IsChecked(this, &SCopyBonesLocationDialog::IsUpdateRefSkelChecked)
-		.ToolTipText(LOCTEXT("UpdateRefSkeletonCheckboxTooltip", "Updates the reference skeleton bones. This is generally what you want."))
-		.OnCheckStateChanged(this, &SCopyBonesLocationDialog::OnUpdateRefSkelChange)
-		.Content()
-		[
-			SNew(STextBlock)
-			.Text(LOCTEXT("UpdateRefSkeleton", "Update Ref Skeleton?"))
-		]
-		]
-	+ SHorizontalBox::Slot()
-		.FillWidth(1)
-		[
-			SNew(SCheckBox)
-			.Style(&FEditorStyle::GetWidgetStyle<FCheckBoxStyle>("Menu.RadioButton"))
-		.IsChecked(this, &SCopyBonesLocationDialog::IsUpdateMeshGeoChecked)
-		.ToolTipText(LOCTEXT("UpdateMeshGeoCheckboxTooltip", "Updates the mesh vertex positions. (Experimental)"))
-		.OnCheckStateChanged(this, &SCopyBonesLocationDialog::OnUpdateMeshChange)
-		.Content()
-		[
-			SNew(STextBlock)
-			.Text(LOCTEXT("UpdateMeshGeo", "Update Mesh Geometry?"))
-		]
-		]
-		]
-	+ SVerticalBox::Slot()
-		.AutoHeight()
-		.HAlign(HAlign_Right)
-		.Padding(5)
-		[
-			SNew(SUniformGridPanel)
-			.SlotPadding(FEditorStyle::GetMargin("StandardDialog.SlotPadding"))
-		.MinDesiredSlotWidth(FEditorStyle::GetFloat("StandardDialog.MinDesiredSlotWidth"))
-		.MinDesiredSlotHeight(FEditorStyle::GetFloat("StandardDialog.MinDesiredSlotHeight"))
-		+ SUniformGridPanel::Slot(0, 0)
-		.HAlign(HAlign_Left)
-		[
-			SNew(SButton)
-			.HAlign(HAlign_Left)
-		.ContentPadding(FEditorStyle::GetMargin("StandardDialog.ContentPadding"))
-		.Text(LOCTEXT("Cancel", "Cancel"))
-		.OnClicked(this, &SCopyBonesLocationDialog::OnButtonClick, ECopyPoseType::Cancel)
-		.IsEnabled(true)
-		]
-	+ SUniformGridPanel::Slot(1, 0)
-		[
-			SNew(SButton)
-			.HAlign(HAlign_Center)
-		.ContentPadding(FEditorStyle::GetMargin("StandardDialog.ContentPadding"))
-		.Text(LOCTEXT("UseCurrentPose", "Use Current Pose"))
-		.IsEnabled_Lambda([this]()
-			{
-				if (SelectedOptions.bUpdateReferenceSkeleton)
-				{
-					return SelectedOptions.bLocations || SelectedOptions.bScale || SelectedOptions.bRotations;
-				}
-				return SelectedOptions.bUpdateMesh || SelectedOptions.bUpdateReferenceSkeleton;
-			})
-		.ToolTipText(LOCTEXT("UseCurrentPoseTooltip", "Use the pose of the preview mesh as the pose source"))
-				.OnClicked(this, &SCopyBonesLocationDialog::OnButtonClick, ECopyPoseType::CurrentPose)
-		]
-	+ SUniformGridPanel::Slot(2, 0)
-		[
-			SNew(SButton)
-			.HAlign(HAlign_Center)
-		.ContentPadding(FEditorStyle::GetMargin("StandardDialog.ContentPadding"))
-		.Text(LOCTEXT("UseSelectedPose", "Use Selected asset pose"))
-		.ToolTipText(LOCTEXT("UseSelectedPoseTooltip", "Use the selected mesh or skeleton as the pose source"))
-		.IsEnabled_Lambda([this]()
-			{
-				if (SelectedOptions.bUpdateReferenceSkeleton)
-				{
-					return SelectedOptions.bLocations || SelectedOptions.bScale || SelectedOptions.bRotations;
-				}
-				return PickedMeshOrSkeleton != nullptr && (
-					SelectedOptions.bUpdateMesh || SelectedOptions.bUpdateReferenceSkeleton
-					);
-			})
-		.OnClicked(this, &SCopyBonesLocationDialog::OnButtonClick, ECopyPoseType::SelectedAsset)
-		]
-
-		]
+			+ SVerticalBox::Slot()
+			[
+				SNew(SCheckBox)
+				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bUseLevelNameAsRootFolder)
+				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bUseLevelNameAsRootFolder)
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_UseLevelNameAsRootFolder", "Use Level Name As Root Folder"))
+				.Content()
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_UseLevelNameAsRootFolder", "Use Level Name As Root Folder"))
+				]
+			]
+			+ SVerticalBox::Slot()
+			[
+				SNew(SCheckBox)
+				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bIterateAllActors)
+				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bIterateAllActors)
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_IterateAllActors", "Iterate All Actors"))
+				.Content()
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_IterateAllActors", "Iterate All Actors"))
+				]
+			]
+			+ SVerticalBox::Slot()
+				[
+					SNew(SCheckBox)
+					.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bSkipActorReplacementConfirmation)
+				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bSkipActorReplacementConfirmation)
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_bSkipActorReplacementConfirmation", ""))
+				.Content()
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_bSkipActorReplacementConfirmation", "Skip Actor Replacement Confirmation"))
+				]
+			]
+			+ SVerticalBox::Slot()
+			[
+				SNew(SCheckBox)
+				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bForceStatic)
+				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bForceStatic)
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_ForceStatic", "Force Static Component"))
+				.Content()
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_ForceStatic", "Force Static Component"))
+				]
+			]
+			+ SVerticalBox::Slot()
+			[
+				SNew(SCheckBox)
+				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bOnlyConstructorComponentsActors)
+				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bOnlyConstructorComponentsActors)
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_OnlyConstructorComponentsActors", "Only Actors that have Components spawned in the Blueprint's constructor"))
+				.Content()
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_OnlyConstructorComponentsActors", "Only Actors that have Components spawned in the Blueprint's constructor"))
+				]
+			]
+			+ SVerticalBox::Slot()
+			[
+				SNew(SCheckBox)
+				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bDeleteOriginal)
+				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bDeleteOriginal)
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_bDeleteOriginal", "Delete Original"))
+				.Content()
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_bDeleteOriginal", "Delete Original"))
+				]
+				]
+			+ SVerticalBox::Slot()
+				[
+					SNew(SCheckBox)
+					.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bSkipDeleteConfirmation)
+				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bSkipDeleteConfirmation)
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_bSkipDeleteConfirmation", "Skip Delete Confirmation"))
+				.Content()
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_bSkipDeleteConfirmation", "Skip Delete Confirmation"))
+				]
+			]
+			//
+			+ SVerticalBox::Slot()
+			.AutoHeight()
+			.HAlign(HAlign_Right)
+			.Padding(5)
+			[
+				SNew(SUniformGridPanel)
+				.SlotPadding(FEditorStyle::GetMargin("StandardDialog.SlotPadding"))
+				.MinDesiredSlotWidth(FEditorStyle::GetFloat("StandardDialog.MinDesiredSlotWidth"))
+				.MinDesiredSlotHeight(FEditorStyle::GetFloat("StandardDialog.MinDesiredSlotHeight"))
+				+ SUniformGridPanel::Slot(0, 0)
+				.HAlign(HAlign_Left)
+				[
+					SNew(SButton)
+					.HAlign(HAlign_Left)
+					.ContentPadding(FEditorStyle::GetMargin("StandardDialog.ContentPadding"))
+					.Text(LOCTEXT("Cancel", "Cancel"))
+					.OnClicked(this, &SMeshFromBlueprint::OnButtonClick, EButtonValue::Cancel)
+					.IsEnabled(true)
+				]
+				+ SUniformGridPanel::Slot(1, 0)
+				.HAlign(HAlign_Left)
+				[
+					SNew(SButton)
+					.HAlign(HAlign_Left)
+					.ContentPadding(FEditorStyle::GetMargin("StandardDialog.ContentPadding"))
+					.Text(LOCTEXT("Accept", "Accept"))
+					.OnClicked(this, &SMeshFromBlueprint::OnButtonClick, EButtonValue::Accept)
+					.IsEnabled(true)
+				]
+			]
 		]
 	);
 }
 
-#undef LOCTEXT_NAMESPACE
+ECheckBoxState SMeshFromBlueprint::IsChecked(bool* Value)
+{
+	return *Value ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+}
 
+void SMeshFromBlueprint::OnChecked(ECheckBoxState NewCheckedState, bool* Value)
+{
+	*Value = NewCheckedState == ECheckBoxState::Checked;
+}
+
+bool SMeshFromBlueprint::ShowModal(FExtractOptions& OutExtractOptions)
+{
+	OutExtractOptions = ExtractOptions;
+	GEditor->EditorAddModalWindow(SharedThis(this));
+	return ButtonPressed == EButtonValue::Accept;
+}
+
+
+FReply SMeshFromBlueprint::OnButtonClick(EButtonValue NewButtonPressed)
+{
+	ButtonPressed = NewButtonPressed;
+	RequestDestroyWindow();
+	return FReply::Handled();
+}
+
+#undef LOCTEXT_NAMESPACE

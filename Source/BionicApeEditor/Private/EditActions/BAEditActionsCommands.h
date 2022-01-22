@@ -26,4 +26,5 @@ public:
 	TSharedPtr<FUICommandInfo> CountSelectedActors;
 	TSharedPtr<FUICommandInfo> ForceMobility;
 	TSharedPtr<FUICommandInfo> HasConstructorComponents;
+	TSharedPtr<FUICommandInfo> MoveActorsToLevelFolder;
 };

@@ -6,7 +6,10 @@ struct FExtractOptions
 {
 	bool bSpawnOneActorPerComponent = false;
 	bool bUseLevelNameAsRootFolder = true;
-	bool bIterateAllActors = true;
 	bool bForceStatic = false;
+	bool bIterateAllActors = true;
+	bool bSkipActorReplacementConfirmation = true;
 	bool bOnlyConstructorComponentsActors = true;
+	bool bDeleteOriginal = true;
+	bool bSkipDeleteConfirmation = true;
 };

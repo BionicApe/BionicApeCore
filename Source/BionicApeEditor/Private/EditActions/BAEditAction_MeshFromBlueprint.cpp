@@ -23,6 +23,7 @@
 #include "Editor/EditorEngine.h"
 #include "Editor.h"
 #include "BAEditActionsLib.h"
+#include "SMeshFromBlueprint.h"
 
 const TSet<FString> FBAEditAction_MeshFromBlueprint::IgnoreClassNames =
 {
@@ -47,7 +48,8 @@ const TSet<FString> FBAEditAction_MeshFromBlueprint::IgnoreClassNames =
 	"GroupActor",
 	"ExponentialHeightFog",
 	"PostProcessVolume",
-
+	"CullDistanceVolume",
+	"Actor"
 };
 
 const TSet<UClass*> FBAEditAction_MeshFromBlueprint::IgnoreClasses =
@@ -84,6 +86,14 @@ public:
 #define LOCTEXT_NAMESPACE "BAEditAction_MeshFromBlueprint"
 
 
+
+bool DeleteOriginal(const FExtractOptions& ExtractOptions)
+{
+	//if skip is false shows a message to ask otherwise returns ExtractOptions.bDeleteOriginal 
+	return (ExtractOptions.bSkipDeleteConfirmation || EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("DeleteOriginal", "Do you want to delete original Actor?")))
+		&& (ExtractOptions.bSkipDeleteConfirmation && ExtractOptions.bDeleteOriginal);
+}
+
 void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 {
 	UWorld* World = GEditor->GetEditorWorldContext().World();
@@ -94,13 +104,22 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 	}
 
 	GEditor->BeginTransaction(LOCTEXT("BAEditAction_MeshFromBlueprint", "Create Mesh Actors from Actor Class"));
-	
-	bool const bSpawnOneActorPerComponent = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("SpawnOneActorPerComponent ", "Do you want to Spawn one Actor per Component?"));
-	bool const bUseLevelNameAsRootFolder = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("Use Level as Folder ", "Use level name as Root Folder?"));
-	bool const bIterateAllActors = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("IterateAllActors", "Do you want to iterate all actors?"));
 
+	TSharedRef<SMeshFromBlueprint> OptionsModal = SNew(SMeshFromBlueprint);
+	// this blocks until the modal is closed
+	FExtractOptions ExtractOptions;
+	bool bAccepted = OptionsModal->ShowModal(ExtractOptions);
 
-	if (bIterateAllActors)
+	if (!bAccepted)
+	{
+		return;
+	}
+
+	//bool const bSpawnOneActorPerComponent = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("SpawnOneActorPerComponent ", "Do you want to Spawn one Actor per Component?"));
+	//bool const bUseLevelNameAsRootFolder = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("Use Level as Folder ", "Use level name as Root Folder?"));
+	//bool const bIterateAllActors = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("IterateAllActors", "Do you want to iterate all actors (false for picking a specific class)?"));
+
+	if (ExtractOptions.bIterateAllActors)
 	{
 		TSet<UClass*> ClassesAlreadySeen;
 		TSet<AActor*> ActorsToDestroy;
@@ -122,24 +141,36 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 				if (bIsAlreadyInSet) continue;
 			}
 
-			FName const ClassName = Actor->GetClass()->GetFName();
-			bool const bExtractThisClass = EAppReturnType::Type::Yes == FMessageDialog::Open(
-				EAppMsgType::YesNo,
-				FText::Format(LOCTEXT("LoadingClass", "Replace Actors of class: '{0}'"), FText::FromName(ClassName))
-			);
-
-			if (bExtractThisClass)
+			if (ExtractOptions.bOnlyConstructorComponentsActors && FBAEditActionsLib::HasConstructorComponents(Actor))
 			{
-				bool const bDeleteOriginal = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("DeleteOriginal", "Do you want to delete original Actor?"));
+				continue;
+			}
 
-				for (TActorIterator<AActor> ChosenActorIt(World, Actor->GetClass()); ChosenActorIt; ++ChosenActorIt)
+			FName const ClassName = Actor->GetClass()->GetFName();
+			
+			bool const bExtractThisClass =
+				ExtractOptions.bSkipActorReplacementConfirmation ||
+				EAppReturnType::Type::Yes == FMessageDialog::Open(
+					EAppMsgType::YesNo,
+					FText::Format(LOCTEXT("LoadingClass", "Replace Actors of class: '{0}'"), FText::FromName(ClassName))
+				);
+
+			if (!bExtractThisClass)
+			{
+				continue;
+			}
+
+			bool const bDeleteOriginal = DeleteOriginal(ExtractOptions);
+
+			for (TActorIterator<AActor> ChosenActorIt(World, Actor->GetClass()); ChosenActorIt; ++ChosenActorIt)
+			{
+				AActor* ChosenActor = *ChosenActorIt;
+
+				FBAEditActionsLib::SpawnActorsFromComponents(ChosenActor, World, ChosenActor->GetClass(), ExtractOptions.bSpawnOneActorPerComponent, ExtractOptions.bUseLevelNameAsRootFolder);
+
+				if (bDeleteOriginal)
 				{
-					AActor* ChosenActor = *ChosenActorIt;
-					FBAEditActionsLib::SpawnActorsFromComponents(ChosenActor, World, ChosenActor->GetClass(), bSpawnOneActorPerComponent, bUseLevelNameAsRootFolder);
-					if (bDeleteOriginal)
-					{
-						ActorsToDestroy.Add(ChosenActor);
-					}
+					ActorsToDestroy.Add(ChosenActor);
 				}
 			}
 		}
@@ -166,12 +197,12 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 
 		if (bPressedOk)
 		{
-			bool const bDeleteOriginal = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("DeleteOriginal", "Do you want to delete original Actor?"));
+			bool const bDeleteOriginal = DeleteOriginal(ExtractOptions);
 
 			for (TActorIterator<AActor> It(World, ChosenClass); It; ++It)
 			{
 				AActor* Actor = *It;
-				FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, ChosenClass, bSpawnOneActorPerComponent, bUseLevelNameAsRootFolder);
+				FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, ChosenClass, ExtractOptions.bSpawnOneActorPerComponent, ExtractOptions.bUseLevelNameAsRootFolder);
 
 				if (bDeleteOriginal)
 				{
