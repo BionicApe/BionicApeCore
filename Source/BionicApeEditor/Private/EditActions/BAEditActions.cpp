@@ -18,7 +18,7 @@
 #include "BAEditAction_ForceMobility.h"
 #include "BAEditAction_HasConstructorComponents.h"
 #include "BAEditAction_MoveActorsToLevelFolder.h"
-#include "PltSimEditorStyle.h"
+#include "BionicApeEditorStyle.h"
 #include "BAEditAction_ForceDefaultMaterial.h"
 #include "BAEditAction_DeleteNullMeshComp.h"
 
@@ -76,8 +76,6 @@ void FBAEditActions::Register()
 		FCanExecuteAction()
 	);
 
-
-
 	//CreateButtonInContentBar();
 	ExtendEditMenu();
 }
@@ -92,7 +90,7 @@ void FBAEditActions::ExtendEditMenu()
 		FMenuExtensionDelegate::CreateLambda(
 			[this](FMenuBuilder& MenuBuilder)
 			{
-				FSlateIcon MenuIcon = FSlateIcon(FPltSimEditorStyle::GetStyleSetName(), "BionicApeEditor.Image");
+				FSlateIcon MenuIcon = FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), "BionicApeEditor.Image");
 				MenuBuilder.AddSubMenu(
 					LOCTEXT("BAEditActions", "BAEditActions"),
 					LOCTEXT("BAEditActions", "BAEditActions"),
@@ -139,7 +137,7 @@ void FBAEditActions::CreateButtonInContentBar()
 			),
 			LOCTEXT("BAEditActions_Friendly", "BAEditActions"),
 			LOCTEXT("BAEditActions_Tooltip", "BAEditActions"),
-			FSlateIcon(FPltSimEditorStyle::GetStyleSetName(), TEXT("BionicApeEditor.Image")));
+			FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), TEXT("BionicApeEditor.Image")));
 		//ToolMenuEntry.StyleNameOverride = "CalloutToolbar";
 
 		FToolMenuSection& Section = AssetsToolBar->AddSection("Content");
