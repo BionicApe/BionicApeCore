@@ -9,6 +9,7 @@
 #include "GameFramework/Actor.h"
 
 #include "EditActions/BAEditActionsLib.h"
+#include "EngineUtils.h"
 
 #define LOCTEXT_NAMESPACE "BAEditAction_MoveActorsToLevelFolder"
 

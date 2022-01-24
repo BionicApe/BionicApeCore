@@ -12,4 +12,5 @@ struct FExtractOptions
 	bool bOnlyConstructorComponentsActors = true;
 	bool bDeleteOriginal = true;
 	bool bSkipDeleteConfirmation = true;
+	bool bReplaceAlreadyExtracted = false;
 };

@@ -12,6 +12,8 @@ void FBAEditActionsCommands::RegisterCommands()
 	UI_COMMAND(RenameSelectedActors, "Rename Selected Actors", "Rename Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(CountSelectedActors, "Count Selected Actors", "Count Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(ForceMobility, "Force Mobility", "Force Mobility to Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
+	UI_COMMAND(ForceDefaultMaterial, "Force Default Material", "Force Default Material", EUserInterfaceActionType::Button, FInputGesture());
+	UI_COMMAND(DeleteNullMeshComp, "Delete Components with Null Mesh of Selected Actors", "Delete Components with Null Mesh of Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(HasConstructorComponents, "HasConstructorComponents", "Has Constructor Components", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(MoveActorsToLevelFolder, "MoveActorsToLevelFolder", "Move Actors To Level Folder", EUserInterfaceActionType::Button, FInputGesture());
 }

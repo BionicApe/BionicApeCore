@@ -49,7 +49,7 @@ const TSet<FString> FBAEditAction_MeshFromBlueprint::IgnoreClassNames =
 	"ExponentialHeightFog",
 	"PostProcessVolume",
 	"CullDistanceVolume",
-	"Actor"
+	"WorldSettings"
 };
 
 const TSet<UClass*> FBAEditAction_MeshFromBlueprint::IgnoreClasses =
@@ -115,10 +115,6 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 		return;
 	}
 
-	//bool const bSpawnOneActorPerComponent = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("SpawnOneActorPerComponent ", "Do you want to Spawn one Actor per Component?"));
-	//bool const bUseLevelNameAsRootFolder = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("Use Level as Folder ", "Use level name as Root Folder?"));
-	//bool const bIterateAllActors = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("IterateAllActors", "Do you want to iterate all actors (false for picking a specific class)?"));
-
 	if (ExtractOptions.bIterateAllActors)
 	{
 		TSet<UClass*> ClassesAlreadySeen;
@@ -166,9 +162,9 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 			{
 				AActor* ChosenActor = *ChosenActorIt;
 
-				FBAEditActionsLib::SpawnActorsFromComponents(ChosenActor, World, ChosenActor->GetClass(), ExtractOptions.bSpawnOneActorPerComponent, ExtractOptions.bUseLevelNameAsRootFolder);
+				bool bIsExtracted = FBAEditActionsLib::SpawnActorsFromComponents(ChosenActor, World, ChosenActor->GetClass(), ExtractOptions);
 
-				if (bDeleteOriginal)
+				if (bIsExtracted && bDeleteOriginal)
 				{
 					ActorsToDestroy.Add(ChosenActor);
 				}
@@ -202,7 +198,7 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 			for (TActorIterator<AActor> It(World, ChosenClass); It; ++It)
 			{
 				AActor* Actor = *It;
-				FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, ChosenClass, ExtractOptions.bSpawnOneActorPerComponent, ExtractOptions.bUseLevelNameAsRootFolder);
+				FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, ChosenClass, ExtractOptions);
 
 				if (bDeleteOriginal)
 				{

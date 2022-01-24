@@ -35,6 +35,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Engine/Selection.h"
 #include "BAEditActionsLib.h"
+#include "ExtractOptions.h"
 
 
 #define LOCTEXT_NAMESPACE "BAEditAction_ActorsFromSelection"
@@ -51,15 +52,15 @@ void FBAEditAction_ActorsFromSelection::ExecuteAction()
 
 	GEditor->BeginTransaction(LOCTEXT("BAEditAction_ActorsFromSelection", "Create Mesh Actors from Actor Class"));
 
-	bool const bDeleteOriginal = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("DeleteOriginal", "Do you want to delete original Actor?"));
-	bool const bSpawnOneActorPerComponent = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("SpawnOneActorPerComponent ", "Do you want to Spawn one Actor per Component?"));
-	bool const bUseLevelNameAsRootFolder = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("Use Level as Folder ", "Use level name as Root Folder?"));
+	FExtractOptions Options;
+
+	Options.bDeleteOriginal = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("DeleteOriginal", "Do you want to delete original Actor?"));
+	Options.bSpawnOneActorPerComponent = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("SpawnOneActorPerComponent ", "Do you want to Spawn one Actor per Component?"));
+	Options.bUseLevelNameAsRootFolder = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("Use Level as Folder ", "Use level name as Root Folder?"));
+	Options.bReplaceAlreadyExtracted = EAppReturnType::Type::Yes == FMessageDialog::Open(EAppMsgType::YesNo, LOCTEXT("Replace already extracted", "Replace already extracted"));
 
 	USelection* SelectedActors = GEditor->GetSelectedActors();
 
-	// Let editor know that we're about to do something that we want to undo/redo
-
-	// For each selected actor
 	for (FSelectionIterator Iter(*SelectedActors); Iter; ++Iter)
 	{
 		AActor* Actor = Cast<AActor>(*Iter);
@@ -68,9 +69,8 @@ void FBAEditAction_ActorsFromSelection::ExecuteAction()
 			continue;
 		}
 
-		FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, Actor->GetClass(), bSpawnOneActorPerComponent, bUseLevelNameAsRootFolder);
-
-		if (bDeleteOriginal)
+		bool bIsExtracted  = FBAEditActionsLib::SpawnActorsFromComponents(Actor, World, Actor->GetClass(), Options);
+		if (bIsExtracted  && Options.bDeleteOriginal)
 		{
 			Actor->Destroy();
 		}

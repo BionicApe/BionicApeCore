@@ -18,6 +18,9 @@
 #include "BAEditAction_ForceMobility.h"
 #include "BAEditAction_HasConstructorComponents.h"
 #include "BAEditAction_MoveActorsToLevelFolder.h"
+#include "PltSimEditorStyle.h"
+#include "BAEditAction_ForceDefaultMaterial.h"
+#include "BAEditAction_DeleteNullMeshComp.h"
 
 #define LOCTEXT_NAMESPACE "FBAEditActions"
 
@@ -53,6 +56,16 @@ void FBAEditActions::Register()
 		FCanExecuteAction()
 	);
 	CommandList->MapAction(
+		FBAEditActionsCommands::Get().DeleteNullMeshComp,
+		FExecuteAction::CreateStatic(&FBAEditAction_DeleteNullMeshComp::ExecuteAction),
+		FCanExecuteAction()
+	);
+	CommandList->MapAction(
+		FBAEditActionsCommands::Get().ForceDefaultMaterial,
+		FExecuteAction::CreateStatic(&FBAEditAction_ForceDefaultMaterial::ExecuteAction),
+		FCanExecuteAction()
+	);
+	CommandList->MapAction(
 		FBAEditActionsCommands::Get().HasConstructorComponents,
 		FExecuteAction::CreateStatic(&FBAEditAction_HasConstructorComponents::ExecuteAction),
 		FCanExecuteAction()
@@ -62,6 +75,7 @@ void FBAEditActions::Register()
 		FExecuteAction::CreateStatic(&FBAEditAction_MoveActorsToLevelFolder::ExecuteAction),
 		FCanExecuteAction()
 	);
+
 
 
 	//CreateButtonInContentBar();
@@ -78,7 +92,7 @@ void FBAEditActions::ExtendEditMenu()
 		FMenuExtensionDelegate::CreateLambda(
 			[this](FMenuBuilder& MenuBuilder)
 			{
-				FSlateIcon MenuIcon = FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), "BionicApeEditor.Image");
+				FSlateIcon MenuIcon = FSlateIcon(FPltSimEditorStyle::GetStyleSetName(), "BionicApeEditor.Image");
 				MenuBuilder.AddSubMenu(
 					LOCTEXT("BAEditActions", "BAEditActions"),
 					LOCTEXT("BAEditActions", "BAEditActions"),
@@ -90,6 +104,8 @@ void FBAEditActions::ExtendEditMenu()
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ActorsFromSelection);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().CountSelectedActors);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ForceMobility);
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().ForceDefaultMaterial);
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().DeleteNullMeshComp);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().HasConstructorComponents);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().MoveActorsToLevelFolder);
 						}
@@ -123,7 +139,7 @@ void FBAEditActions::CreateButtonInContentBar()
 			),
 			LOCTEXT("BAEditActions_Friendly", "BAEditActions"),
 			LOCTEXT("BAEditActions_Tooltip", "BAEditActions"),
-			FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), TEXT("BionicApeEditor.Image")));
+			FSlateIcon(FPltSimEditorStyle::GetStyleSetName(), TEXT("BionicApeEditor.Image")));
 		//ToolMenuEntry.StyleNameOverride = "CalloutToolbar";
 
 		FToolMenuSection& Section = AssetsToolBar->AddSection("Content");

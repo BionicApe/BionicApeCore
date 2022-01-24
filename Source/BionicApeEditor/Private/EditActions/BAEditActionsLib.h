@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ExtractOptions.h"
 
 class AActor;
 class UWorld;
@@ -13,8 +14,14 @@ class FBAEditActionsLib
 {
 
 public:
+
+	static FName ExtractedTag;
+	static FString LevelFolderPrefix;
+
+public:
 	
-	static bool SpawnActorsFromComponents(AActor* Actor, UWorld* World, UClass* ChosenClass, bool const bSpawnOneActorPerComp = false, bool const bUseLevelNameAsRootFolder = true);
+	static bool SpawnActorsFromComponents(AActor* Actor, UWorld* World, UClass* ChosenClass, const FExtractOptions& Options);
 	static void CreateFolderPath(AActor* Actor, UClass* ChosenClass, bool const bUseLevelNameAsRootFolder = true);
-	static bool HasConstructorComponents(AActor* Actor);
+	static bool HasConstructorComponents(const AActor* Actor);
+	static bool IsAnExtractedActor(const AActor* Actor);
 };

@@ -24,11 +24,11 @@ void SMeshFromBlueprint::Construct(const FArguments& InArgs)
 				SNew(SCheckBox)
 				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bSpawnOneActorPerComponent /*, ExtractOptions.bSpawnOneActorPerComponent*/)
 				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bSpawnOneActorPerComponent)
-				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_SpawnOneActorPerComponent", "Spawns One Actor Per Component"))
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_SpawnOneActorPerComponent", "Spawns one actor per component"))
 				.Content()
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_SpawnOneActorPerComponent", "Spawn One Actor per Component"))
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_SpawnOneActorPerComponent", "Spawn one actor per component"))
 				]
 			]
 			+ SVerticalBox::Slot()
@@ -36,11 +36,11 @@ void SMeshFromBlueprint::Construct(const FArguments& InArgs)
 				SNew(SCheckBox)
 				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bUseLevelNameAsRootFolder)
 				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bUseLevelNameAsRootFolder)
-				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_UseLevelNameAsRootFolder", "Use Level Name As Root Folder"))
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_UseLevelNameAsRootFolder", "Use level name as root folder"))
 				.Content()
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_UseLevelNameAsRootFolder", "Use Level Name As Root Folder"))
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_UseLevelNameAsRootFolder", "Use level name as root folder"))
 				]
 			]
 			+ SVerticalBox::Slot()
@@ -48,23 +48,23 @@ void SMeshFromBlueprint::Construct(const FArguments& InArgs)
 				SNew(SCheckBox)
 				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bIterateAllActors)
 				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bIterateAllActors)
-				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_IterateAllActors", "Iterate All Actors"))
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_IterateAllActors", "Iterate all actors"))
 				.Content()
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_IterateAllActors", "Iterate All Actors"))
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_IterateAllActors", "Iterate all actors"))
 				]
 			]
 			+ SVerticalBox::Slot()
-				[
-					SNew(SCheckBox)
-					.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bSkipActorReplacementConfirmation)
+			[
+				SNew(SCheckBox)
+				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bSkipActorReplacementConfirmation)
 				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bSkipActorReplacementConfirmation)
-				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_bSkipActorReplacementConfirmation", ""))
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_bSkipActorReplacementConfirmation", "Skip actor replacement confirmation"))
 				.Content()
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_bSkipActorReplacementConfirmation", "Skip Actor Replacement Confirmation"))
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_bSkipActorReplacementConfirmation", "Skip actor replacement confirmation"))
 				]
 			]
 			+ SVerticalBox::Slot()
@@ -72,11 +72,11 @@ void SMeshFromBlueprint::Construct(const FArguments& InArgs)
 				SNew(SCheckBox)
 				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bForceStatic)
 				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bForceStatic)
-				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_ForceStatic", "Force Static Component"))
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_ForceStatic", "Force static mobility to each Component"))
 				.Content()
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_ForceStatic", "Force Static Component"))
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_ForceStatic", "Force static mobility to each Component"))
 				]
 			]
 			+ SVerticalBox::Slot()
@@ -84,11 +84,11 @@ void SMeshFromBlueprint::Construct(const FArguments& InArgs)
 				SNew(SCheckBox)
 				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bOnlyConstructorComponentsActors)
 				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bOnlyConstructorComponentsActors)
-				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_OnlyConstructorComponentsActors", "Only Actors that have Components spawned in the Blueprint's constructor"))
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_OnlyConstructorComponentsActors", "Only actors with Components spawned in the Blueprint's constructor"))
 				.Content()
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_OnlyConstructorComponentsActors", "Only Actors that have Components spawned in the Blueprint's constructor"))
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_OnlyConstructorComponentsActors", "Only actors with components spawned in the Blueprint's constructor"))
 				]
 			]
 			+ SVerticalBox::Slot()
@@ -96,23 +96,35 @@ void SMeshFromBlueprint::Construct(const FArguments& InArgs)
 				SNew(SCheckBox)
 				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bDeleteOriginal)
 				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bDeleteOriginal)
-				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_bDeleteOriginal", "Delete Original"))
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_bDeleteOriginal", "Delete original Actor"))
 				.Content()
 				[
 					SNew(STextBlock)
-					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_bDeleteOriginal", "Delete Original"))
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_bDeleteOriginal", "Delete original Actor"))
 				]
-				]
+			]
 			+ SVerticalBox::Slot()
-				[
-					SNew(SCheckBox)
-					.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bSkipDeleteConfirmation)
+			[
+				SNew(SCheckBox)
+				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bSkipDeleteConfirmation)
 				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bSkipDeleteConfirmation)
 				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_bSkipDeleteConfirmation", "Skip Delete Confirmation"))
 				.Content()
 				[
 					SNew(STextBlock)
 					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_bSkipDeleteConfirmation", "Skip Delete Confirmation"))
+				]
+			]
+			+ SVerticalBox::Slot()
+			[
+				SNew(SCheckBox)
+				.OnCheckStateChanged_Static(&SMeshFromBlueprint::OnChecked, &ExtractOptions.bReplaceAlreadyExtracted)
+				.IsChecked_Static(&SMeshFromBlueprint::IsChecked, &ExtractOptions.bReplaceAlreadyExtracted)
+				.ToolTipText(LOCTEXT("SMeshFromBlueprints_Tooltip_bReplaceAlreadyExtracted", "Extract actors already extracted"))
+				.Content()
+				[
+					SNew(STextBlock)
+					.Text(LOCTEXT("SMeshFromBlueprints_Checkbox_bReplaceAlreadyExtracted", "Extract actors already extracted"))
 				]
 			]
 			//

@@ -23,24 +23,21 @@
 #include "UObject/UObjectGlobals.h"
 
 #include "GameFramework/Actor.h"
+#include "Components/SceneComponent.h"
+
+FName FBAEditActionsLib::ExtractedTag = "BAEditActions_Extracted";
+FString FBAEditActionsLib::LevelFolderPrefix = "EX_";
 
 
-
-void FBAEditActionsLib::CreateFolderPath(AActor* Actor, UClass* ChosenClass, bool const bUseLevelNameAsRootFolder /*= true*/)
+void FBAEditActionsLib::CreateFolderPath(AActor* Actor, UClass* ChosenClass, bool const bUseLevelNameAsRoot /*= true*/)
 {
-	FString ConstructedPath;
-
-	if (!Actor->GetFolderPath().ToString().Contains(Actor->GetLevel()->GetOuter()->GetName()))
-	{
-		ConstructedPath = "/" + Actor->GetLevel()->GetOuter()->GetName();
-	}
-	
-	Actor->SetFolderPath(bUseLevelNameAsRootFolder ? *FString::Printf(TEXT("%s/%s"), *Actor->GetLevel()->GetOuter()->GetName(), *ChosenClass->GetName()) : *ChosenClass->GetName());
+	FName const NewFolderName = bUseLevelNameAsRoot ? *FString::Printf(TEXT("%s%s/%s"), *LevelFolderPrefix, *Actor->GetLevel()->GetOuter()->GetName(), *ChosenClass->GetName()) : *ChosenClass->GetName();
+	Actor->SetFolderPath(NewFolderName);
 }
 
-bool FBAEditActionsLib::HasConstructorComponents(AActor* Actor)
+bool FBAEditActionsLib::HasConstructorComponents(const AActor* Actor)
 {
-	for (UActorComponent* Comp : Actor->GetComponents())
+	for (const UActorComponent* Comp : Actor->GetComponents())
 	{
 		if (Comp->CreationMethod == EComponentCreationMethod::UserConstructionScript)
 		{
@@ -50,26 +47,54 @@ bool FBAEditActionsLib::HasConstructorComponents(AActor* Actor)
 	return false;
 }
 
-bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, UClass* ChosenClass, bool const bSpawnOneActorPerComp, bool const bUseLevelNameAsRootFolder)
+bool FBAEditActionsLib::IsAnExtractedActor(const AActor* Actor)
+{
+	return Actor && Actor->Tags.Contains(FBAEditActionsLib::ExtractedTag);
+}
+
+bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, UClass* ChosenClass, const FExtractOptions& Options)
 {
 	if (!Actor || !World || !ChosenClass)
 	{
 		UE_LOG(LogTemp, Error, TEXT("invalid parameters: !Actor || !World || !ChosenClass"));
 		return false;
 	}
+	UE_LOG(LogTemp, Log, TEXT("Replacing Actor %s"), *Actor->GetName());
+	if (!Actor->GetRootComponent())
+	{
+		UE_LOG(LogTemp, Error, TEXT("No Root Component for Actor: %s"), *Actor->GetName());
+		return false;
+	}
+	if (!Options.bReplaceAlreadyExtracted && FBAEditActionsLib::IsAnExtractedActor(Actor))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Actor %s is Extracted and Options bReplaceAlreadyExtracted is false, we skip this Actor"), *Actor->GetName());
+		return false;
+	}
 
 	AActor* SpawnedActor = nullptr;
 
-	if (!bSpawnOneActorPerComp)
+	if (!Options.bSpawnOneActorPerComponent)
 	{
 		//Spawn only one Actor
 		SpawnedActor = World->SpawnActor<AActor>(AActor::StaticClass(), Actor->GetTransform());
-		FBAEditActionsLib::CreateFolderPath(Actor, ChosenClass, bUseLevelNameAsRootFolder);
+		FBAEditActionsLib::CreateFolderPath(SpawnedActor, ChosenClass, Options.bUseLevelNameAsRootFolder);
 		FActorLabelUtilities::SetActorLabelUnique(SpawnedActor, ChosenClass->GetName());
+		SpawnedActor->Tags.Add(FBAEditActionsLib::ExtractedTag);
 
-		USceneComponent* RootComponent = Actor->GetRootComponent();
-		RootComponent->SetMobility(Actor->GetRootComponent()->Mobility);
+		USceneComponent* RootComponent = SpawnedActor->GetRootComponent();
+		if (!RootComponent)
+		{
+			RootComponent = NewObject<USceneComponent>(SpawnedActor);			
+			SpawnedActor->AddInstanceComponent(RootComponent);
+			RootComponent->SetWorldTransform(Actor->GetTransform());
+			RootComponent->OnComponentCreated();
+			RootComponent->RegisterComponent();
+			SpawnedActor->SetRootComponent(RootComponent);
+		}
+		RootComponent->SetMobility(Options.bForceStatic ? EComponentMobility::Static : Actor->GetRootComponent()->Mobility);		
 	}
+
+	bool bHasExtracted = false;
 
 	for (UActorComponent* Comp : Actor->GetComponents())
 	{
@@ -77,16 +102,19 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 		{
 			if (UStaticMesh* StaticMesh = OriginalStaticMeshComp->GetStaticMesh())
 			{
+				bHasExtracted = true;
 
 				UStaticMeshComponent* CreatedComp = nullptr;
 
-				if (bSpawnOneActorPerComp)
+				if (Options.bSpawnOneActorPerComponent)
 				{
 
 					AStaticMeshActor* MeshActor = World->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), OriginalStaticMeshComp->GetComponentTransform());
-					FBAEditActionsLib::CreateFolderPath(Actor, ChosenClass, bUseLevelNameAsRootFolder);
+					FBAEditActionsLib::CreateFolderPath(MeshActor, ChosenClass, Options.bUseLevelNameAsRootFolder);
 					FActorLabelUtilities::SetActorLabelUnique(MeshActor, StaticMesh->GetName());
+					MeshActor->Tags.Add("BAEditActions_Extracted");
 					CreatedComp = MeshActor->GetStaticMeshComponent();
+					CreatedComp->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalStaticMeshComp->Mobility);
 				}
 				else
 				{
@@ -94,13 +122,13 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 					//CreatedComp->CreationMethod = EComponentCreationMethod::Instance;
 					SpawnedActor->AddInstanceComponent(CreatedComp);
 					CreatedComp->SetWorldTransform(OriginalStaticMeshComp->GetComponentTransform());
+					CreatedComp->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalStaticMeshComp->Mobility);
 					CreatedComp->AttachToComponent(SpawnedActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 					CreatedComp->OnComponentCreated();
 					CreatedComp->RegisterComponent();
 				}
 
 				CreatedComp->SetStaticMesh(StaticMesh);
-				CreatedComp->SetMobility(OriginalStaticMeshComp->Mobility);
 
 				for (int32 i = 0; i < OriginalStaticMeshComp->GetNumMaterials(); i++)
 				{
@@ -116,9 +144,11 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 		}
 		else if (ULightComponent* OriginalLightComp = Cast<ULightComponent>(Comp))
 		{
+			bHasExtracted = true;
+
 			ULightComponent* NewLightComponent = nullptr;
 
-			if (bSpawnOneActorPerComp)
+			if (Options.bSpawnOneActorPerComponent)
 			{
 				ALight* LightActor = nullptr;
 
@@ -144,10 +174,12 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 					continue;
 				}
 
-				FBAEditActionsLib::CreateFolderPath(Actor, ChosenClass, bUseLevelNameAsRootFolder);
+				FBAEditActionsLib::CreateFolderPath(LightActor, ChosenClass, Options.bUseLevelNameAsRootFolder);
 				FActorLabelUtilities::SetActorLabelUnique(LightActor, ChosenClass->GetName());
+				LightActor->Tags.Add("BAEditActions_Extracted");
 
 				NewLightComponent = LightActor->GetLightComponent();
+				NewLightComponent->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalLightComp->Mobility);
 			}
 			else
 			{
@@ -155,13 +187,13 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 				//NewLightComponent->CreationMethod = EComponentCreationMethod::Instance;
 				SpawnedActor->AddInstanceComponent(NewLightComponent);
 				NewLightComponent->SetWorldTransform(OriginalLightComp->GetComponentTransform());
+				NewLightComponent->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalLightComp->Mobility);
 				NewLightComponent->AttachToComponent(SpawnedActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 				NewLightComponent->OnComponentCreated();
 				NewLightComponent->RegisterComponent();
 			}
 
 			{//Set light values
-				NewLightComponent->SetMobility(OriginalLightComp->Mobility);
 				NewLightComponent->SetIntensity(OriginalLightComp->Intensity);
 				NewLightComponent->SetLightColor(OriginalLightComp->GetLightColor());
 
@@ -205,5 +237,18 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 		}
 	}
 
-	return true;
+	if (bHasExtracted)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Actor %s Succesfully replaced"), *Actor->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Actor %s didn't have any Components to extract"), *Actor->GetName());
+		if (SpawnedActor)
+		{
+			SpawnedActor->Destroy();
+		}
+	}
+
+	return bHasExtracted;
 }
