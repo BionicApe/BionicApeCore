@@ -16,6 +16,7 @@ void FBAEditActionsCommands::RegisterCommands()
 	UI_COMMAND(DeleteNullMeshComp, "Delete Components with Null Mesh of Selected Actors", "Delete Components with Null Mesh of Selected Actors", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(HasConstructorComponents, "HasConstructorComponents", "Has Constructor Components", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(MoveActorsToLevelFolder, "MoveActorsToLevelFolder", "Move Actors To Level Folder", EUserInterfaceActionType::Button, FInputGesture());
+	UI_COMMAND(SelectAllSameMesh, "SelectAllSameMesh", "Select all Actors with the same Mesh", EUserInterfaceActionType::Button, FInputGesture());
 }
 
 #undef LOCTEXT_NAMESPACE

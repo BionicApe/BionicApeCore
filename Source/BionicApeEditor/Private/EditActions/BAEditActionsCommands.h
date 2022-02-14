@@ -29,4 +29,5 @@ public:
 	TSharedPtr<FUICommandInfo> DeleteNullMeshComp;
 	TSharedPtr<FUICommandInfo> HasConstructorComponents;
 	TSharedPtr<FUICommandInfo> MoveActorsToLevelFolder;
+	TSharedPtr<FUICommandInfo> SelectAllSameMesh;	
 };

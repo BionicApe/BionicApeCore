@@ -35,7 +35,7 @@ void FBAEditAction_MoveActorsToLevelFolder::ExecuteAction()
 		{
 			if (AActor* Actor = Cast<AActor>(*Iter))
 			{
-				FBAEditActionsLib::CreateFolderPath(Actor, Actor->GetClass(), true);
+				FBAEditActionsLib::CreateFolderPath(Actor, Actor->GetClass(), true, Actor);
 			}
 		}
 	}
@@ -45,7 +45,7 @@ void FBAEditAction_MoveActorsToLevelFolder::ExecuteAction()
 		{
 			if (AActor* Actor = *It)
 			{
-				FBAEditActionsLib::CreateFolderPath(Actor, Actor->GetClass(), true);
+				FBAEditActionsLib::CreateFolderPath(Actor, Actor->GetClass(), true, Actor);
 			}
 		}
 	}

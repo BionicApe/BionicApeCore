@@ -49,7 +49,8 @@ const TSet<FString> FBAEditAction_MeshFromBlueprint::IgnoreClassNames =
 	"ExponentialHeightFog",
 	"PostProcessVolume",
 	"CullDistanceVolume",
-	"WorldSettings"
+	"WorldSettings",
+	"Actor"
 };
 
 const TSet<UClass*> FBAEditAction_MeshFromBlueprint::IgnoreClasses =

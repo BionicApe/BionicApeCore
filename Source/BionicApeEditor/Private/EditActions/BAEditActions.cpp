@@ -21,6 +21,7 @@
 #include "BionicApeEditorStyle.h"
 #include "BAEditAction_ForceDefaultMaterial.h"
 #include "BAEditAction_DeleteNullMeshComp.h"
+#include "BAEditAction_SelectAllSameMesh.h"
 
 #define LOCTEXT_NAMESPACE "FBAEditActions"
 
@@ -75,6 +76,11 @@ void FBAEditActions::Register()
 		FExecuteAction::CreateStatic(&FBAEditAction_MoveActorsToLevelFolder::ExecuteAction),
 		FCanExecuteAction()
 	);
+	CommandList->MapAction(
+		FBAEditActionsCommands::Get().SelectAllSameMesh,
+		FExecuteAction::CreateStatic(&FBAEditAction_SelectAllSameMesh::ExecuteAction),
+		FCanExecuteAction()
+	);
 
 	//CreateButtonInContentBar();
 	ExtendEditMenu();
@@ -106,6 +112,7 @@ void FBAEditActions::ExtendEditMenu()
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().DeleteNullMeshComp);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().HasConstructorComponents);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().MoveActorsToLevelFolder);
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().SelectAllSameMesh);
 						}
 					),
 					false,

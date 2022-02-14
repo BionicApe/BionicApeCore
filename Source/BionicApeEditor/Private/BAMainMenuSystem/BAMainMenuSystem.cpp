@@ -36,29 +36,29 @@ namespace BAMainMenu
 
 void FBAMainMenuSystem::Register()
 {
-	FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
-		BAMainMenu::BAMainMenuSystemWindowID,
-		FOnSpawnTab::CreateStatic(&BAMainMenu::SpawnNomadTab))
-			.SetDisplayName(LOCTEXT("TabTitle", "Bionic Ape Editor Tools"))
-			.SetTooltipText(LOCTEXT("TooltipText", "Access all Bionic Ape Editor Tools"))
-			.SetGroup(WorkspaceMenu::GetMenuStructure().GetLevelEditorCategory())
-			.SetIcon(FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(),
-		"BionicApeEditor.Image")
-	);
+	//FGlobalTabmanager::Get()->RegisterNomadTabSpawner(
+	//	BAMainMenu::BAMainMenuSystemWindowID,
+	//	FOnSpawnTab::CreateStatic(&BAMainMenu::SpawnNomadTab))
+	//		.SetDisplayName(LOCTEXT("TabTitle", "Bionic Ape Editor Tools"))
+	//		.SetTooltipText(LOCTEXT("TooltipText", "Access all Bionic Ape Editor Tools"))
+	//		.SetGroup(WorkspaceMenu::GetMenuStructure().GetLevelEditorCategory())
+	//		.SetIcon(FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(),
+	//	"BionicApeEditor.Image")
+	//);
 
-	UToolMenu* AssetsToolBar = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar.AssetsToolBar");
-	if (AssetsToolBar)
-	{
-		FToolMenuSection& Section = AssetsToolBar->AddSection("Content");
-		FToolMenuEntry ToolMenuEntry = FToolMenuEntry::InitToolBarButton(
-			"BionicApeEditorLaunchPad",
-			FUIAction(FExecuteAction::CreateStatic(&FBAMainMenuSystem::Launch)),
-			LOCTEXT("BAToolbarButtonText_1", "Bionic Ape"),
-			LOCTEXT("BAToolbarButtonTooltip", "Bionic Ape Editor Tools"),
-			FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), TEXT("BionicApeEditor.Image")));
-		ToolMenuEntry.StyleNameOverride = "CalloutToolbar";
-		Section.AddEntry(ToolMenuEntry);
-	}
+	//UToolMenu* AssetsToolBar = UToolMenus::Get()->ExtendMenu("LevelEditor.LevelEditorToolBar.AssetsToolBar");
+	//if (AssetsToolBar)
+	//{
+	//	FToolMenuSection& Section = AssetsToolBar->AddSection("Content");
+	//	FToolMenuEntry ToolMenuEntry = FToolMenuEntry::InitToolBarButton(
+	//		"BionicApeEditorLaunchPad",
+	//		FUIAction(FExecuteAction::CreateStatic(&FBAMainMenuSystem::Launch)),
+	//		LOCTEXT("BAToolbarButtonText_1", "Bionic Ape"),
+	//		LOCTEXT("BAToolbarButtonTooltip", "Bionic Ape Editor Tools"),
+	//		FSlateIcon(FBionicApeEditorStyle::GetStyleSetName(), TEXT("BionicApeEditor.Image")));
+	//	ToolMenuEntry.StyleNameOverride = "CalloutToolbar";
+	//	Section.AddEntry(ToolMenuEntry);
+	//}
 }
 
 void FBAMainMenuSystem::Unregister()

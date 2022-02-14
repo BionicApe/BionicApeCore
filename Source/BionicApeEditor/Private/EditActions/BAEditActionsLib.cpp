@@ -29,9 +29,9 @@ FName FBAEditActionsLib::ExtractedTag = "BAEditActions_Extracted";
 FString FBAEditActionsLib::LevelFolderPrefix = "EX_";
 
 
-void FBAEditActionsLib::CreateFolderPath(AActor* Actor, UClass* ChosenClass, bool const bUseLevelNameAsRoot /*= true*/)
+void FBAEditActionsLib::CreateFolderPath(AActor* Actor, UClass* ChosenClass, bool const bUseLevelNameAsRoot /*= true*/, AActor* OriginalActor/* = nullptr*/)
 {
-	FName const NewFolderName = bUseLevelNameAsRoot ? *FString::Printf(TEXT("%s%s/%s"), *LevelFolderPrefix, *Actor->GetLevel()->GetOuter()->GetName(), *ChosenClass->GetName()) : *ChosenClass->GetName();
+	FName const NewFolderName = bUseLevelNameAsRoot ? *FString::Printf(TEXT("%s%s/%s"), *LevelFolderPrefix, *OriginalActor->GetLevel()->GetOuter()->GetName(), *ChosenClass->GetName()) : *ChosenClass->GetName();
 	Actor->SetFolderPath(NewFolderName);
 }
 
@@ -77,7 +77,7 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 	{
 		//Spawn only one Actor
 		SpawnedActor = World->SpawnActor<AActor>(AActor::StaticClass(), Actor->GetTransform());
-		FBAEditActionsLib::CreateFolderPath(SpawnedActor, ChosenClass, Options.bUseLevelNameAsRootFolder);
+		FBAEditActionsLib::CreateFolderPath(SpawnedActor, ChosenClass, Options.bUseLevelNameAsRootFolder, Actor);
 		FActorLabelUtilities::SetActorLabelUnique(SpawnedActor, ChosenClass->GetName());
 		SpawnedActor->Tags.Add(FBAEditActionsLib::ExtractedTag);
 
@@ -110,7 +110,7 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 				{
 
 					AStaticMeshActor* MeshActor = World->SpawnActor<AStaticMeshActor>(AStaticMeshActor::StaticClass(), OriginalStaticMeshComp->GetComponentTransform());
-					FBAEditActionsLib::CreateFolderPath(MeshActor, ChosenClass, Options.bUseLevelNameAsRootFolder);
+					FBAEditActionsLib::CreateFolderPath(MeshActor, ChosenClass, Options.bUseLevelNameAsRootFolder, Actor);
 					FActorLabelUtilities::SetActorLabelUnique(MeshActor, StaticMesh->GetName());
 					MeshActor->Tags.Add("BAEditActions_Extracted");
 					CreatedComp = MeshActor->GetStaticMeshComponent();
@@ -174,7 +174,7 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 					continue;
 				}
 
-				FBAEditActionsLib::CreateFolderPath(LightActor, ChosenClass, Options.bUseLevelNameAsRootFolder);
+				FBAEditActionsLib::CreateFolderPath(LightActor, ChosenClass, Options.bUseLevelNameAsRootFolder, Actor);
 				FActorLabelUtilities::SetActorLabelUnique(LightActor, ChosenClass->GetName());
 				LightActor->Tags.Add("BAEditActions_Extracted");
 

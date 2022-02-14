@@ -21,7 +21,7 @@ public:
 public:
 	
 	static bool SpawnActorsFromComponents(AActor* Actor, UWorld* World, UClass* ChosenClass, const FExtractOptions& Options);
-	static void CreateFolderPath(AActor* Actor, UClass* ChosenClass, bool const bUseLevelNameAsRootFolder = true);
+	static void CreateFolderPath(AActor* Actor, UClass* ChosenClass, bool const bUseLevelNameAsRootFolder = true, AActor* OriginalActor = nullptr);
 	static bool HasConstructorComponents(const AActor* Actor);
 	static bool IsAnExtractedActor(const AActor* Actor);
 };
