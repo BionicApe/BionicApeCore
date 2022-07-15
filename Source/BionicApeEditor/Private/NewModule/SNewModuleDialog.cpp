@@ -10,7 +10,7 @@
 #include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Workflow/SWizard.h"
 
-#define LOCTEXT_NAMESPACE "FModuleGenerationModule"
+#define LOCTEXT_NAMESPACE "SNewModuleDialog"
 
 void SNewModuleDialog::Construct(const FArguments& InArgs)
 {

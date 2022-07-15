@@ -21,10 +21,14 @@ public:
 	APlayerController* GetController() const;
 
 	UFUNCTION(BlueprintCallable)
+	APawn* GetControlledPawn() const;
+	
+	UFUNCTION(BlueprintCallable)
 	AHUD* GetHUD() const;
 
 	TScriptInterface<IBAHUDInterface> GetBAHUD() const;
 
 	UFUNCTION(Client, Reliable, BlueprintCallable)
 	void Client_Notify(bool bIsSuccessful, const FString& Message);
+
 };

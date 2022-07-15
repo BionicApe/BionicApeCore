@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 // Created by Bionic Ape. All rights reseved.
+=======
+>>>>>>> 8ad7dae00ab95cf7f474e123e83830c2f8250084
 
 #pragma once
 
@@ -12,18 +15,8 @@ class BIONICAPECORE_API AFPPCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AFPPCharacter();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 };

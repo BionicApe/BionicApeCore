@@ -1,29 +1,15 @@
+<<<<<<< HEAD
 // Created by Bionic Ape. All rights reseved.
 
+=======
+>>>>>>> 8ad7dae00ab95cf7f474e123e83830c2f8250084
 
 #include "GameFramework/FPPCharacter.h"
 #include "Components/InputComponent.h"
 
-// Sets default values
 AFPPCharacter::AFPPCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-}
-
-// Called when the game starts or when spawned
-void AFPPCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AFPPCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
