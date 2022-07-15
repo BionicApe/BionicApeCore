@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 // Created by Bionic Ape. All rights reseved.
-
-=======
->>>>>>> 8ad7dae00ab95cf7f474e123e83830c2f8250084
 
 #include "GameFramework/FPPCharacter.h"
 #include "Components/InputComponent.h"
