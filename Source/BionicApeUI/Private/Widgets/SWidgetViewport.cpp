@@ -55,6 +55,9 @@ void SWidgetViewport::Construct(const FArguments& InArgs)
 	ViewportClient = MakeShareable(new FWidgetViewportClient(InArgs._WidgetWorld));
 	Viewport = MakeShareable(new FSceneViewport(ViewportClient.Get(), SharedThis(this)));
 
+	//The ViewportClient needs a refference to the Viewport, this doesn't look correct, as im passing a pointer from a shared pointer
+	ViewportClient->SetViewport(Viewport.Get());
+
 	// The viewport widget needs an interface so it knows what should render
 	SetViewportInterface(Viewport.ToSharedRef());
 // 

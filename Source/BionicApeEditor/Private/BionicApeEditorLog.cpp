@@ -2,4 +2,4 @@
 
 #include "BionicApeEditorLog.h"
 
-DEFINE_LOG_CATEGORY(ModuleGeneration);
+DEFINE_LOG_CATEGORY(LogBionicApeEditor);

@@ -54,6 +54,8 @@ public:
 	void SetBackgroundColor(FLinearColor InColor);
 	FLinearColor GetBackgroundColor() const;
 
+	void SetViewport(FViewport* InViewport);
+
 	void SetLocation(const FVector& InLocation);
 	void SetRotation(const FRotator& InRotation);
 	void SetFOV(const float& InFOV);

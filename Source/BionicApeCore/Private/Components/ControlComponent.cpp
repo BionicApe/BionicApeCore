@@ -11,6 +11,15 @@ APlayerController* UControlComponent::GetController() const
 	return Cast<APlayerController>(GetOwner());
 }
 
+APawn* UControlComponent::GetControlledPawn() const
+{
+	if (APlayerController* PC = GetController())
+	{
+		return PC->GetPawn();
+	}
+	return nullptr;
+}
+
 AHUD* UControlComponent::GetHUD() const
 {
 	if (APlayerController* PC = GetController())

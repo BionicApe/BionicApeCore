@@ -184,8 +184,8 @@ void FBAEditAction_MeshFromBlueprint::ExecuteAction()
 
 		TSharedPtr<FAssetClassParentFilter> Filter = MakeShared<FAssetClassParentFilter>();
 		Filter->AllowedChildrenOfClasses.Add(AActor::StaticClass());
+		Options.ClassFilters.Add(Filter.ToSharedRef());
 
-		Options.ClassFilter = Filter;
 
 		const FText TitleText = NSLOCTEXT("AudioModulation", "CreateSoundModulationParameterOptions", "Select Parameter Class");
 		UClass* ChosenClass = nullptr;

@@ -37,7 +37,6 @@ public class BionicApeEditor : ModuleRules
 				"Slate",
 				"SlateCore",
 				"ApplicationCore",
-				"Json",
 				"EditorFramework",//Introduced in UE5
 				"ImageWrapper"
 			}
