@@ -10,9 +10,9 @@
 #include "Widgets/Input/SSegmentedControl.h"
 #include "Engine/EngineTypes.h"
 #include "GameFramework/Actor.h"
-#include <Styling/ISlateStyle.h>
-#include <Styling/AppStyle.h>
-#include <Widgets/SBoxPanel.h>
+#include "Styling/ISlateStyle.h"
+#include "Styling/AppStyle.h"
+#include "Widgets/SBoxPanel.h"
 
 #define LOCTEXT_NAMESPACE "BAEditAction_ForceMobility"
 
