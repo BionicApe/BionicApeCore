@@ -34,9 +34,9 @@ void ABATPCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	//InputComponent->BindAction("Action1", IE_Pressed, this, &AThePrisonCharacter::Action1Pressed);
-	//InputComponent->BindAction("Action2", IE_Pressed, this, &AThePrisonCharacter::Action2Pressed);
-	//InputComponent->BindAction("Action3", IE_Pressed, this, &AThePrisonCharacter::Action3Pressed);
+	//InputComponent->BindAction("Action1", IE_Pressed, this, &AMetaverseCharacter::Action1Pressed);
+	//InputComponent->BindAction("Action2", IE_Pressed, this, &AMetaverseCharacter::Action2Pressed);
+	//InputComponent->BindAction("Action3", IE_Pressed, this, &AMetaverseCharacter::Action3Pressed);
 
 	InputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
