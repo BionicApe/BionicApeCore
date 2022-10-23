@@ -12,9 +12,9 @@ APlayerController* UControlComponent::GetController() const
 }
 
 APawn* UControlComponent::GetControlledPawn() const
+	{
 {
 	if (APlayerController* PC = GetController())
-	{
 		return PC->GetPawn();
 	}
 	return nullptr;
