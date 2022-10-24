@@ -28,5 +28,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Viewport")
 	void OnNewObject(UObject* NewObj);
 
+	UFUNCTION(BlueprintCallable)
 	virtual void SetNewObject(UObject* NewObj);
 };

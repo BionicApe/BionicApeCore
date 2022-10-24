@@ -74,7 +74,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = Appearance)
 	TSubclassOf<AViewportWidgetHelper> ViewportWidgetHelperClass;
 
-	UPROPERTY(VisibleAnywhere, Category = Appearance)
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Appearance)
 	AViewportWidgetHelper* ViewportWidgetHelper;
 	
 	UPROPERTY(EditAnywhere, Category = Appearance, meta = (editcondition = "bGenerateDefaultLight"))
