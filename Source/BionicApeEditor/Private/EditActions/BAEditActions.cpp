@@ -22,6 +22,7 @@
 #include "BAEditAction_ForceDefaultMaterial.h"
 #include "BAEditAction_DeleteNullMeshComp.h"
 #include "BAEditAction_SelectAllSameMesh.h"
+#include "CreateFactory/BAEditAction_CreateFactory.h"
 
 #define LOCTEXT_NAMESPACE "FBAEditActions"
 
@@ -81,6 +82,11 @@ void FBAEditActions::Register()
 		FExecuteAction::CreateStatic(&FBAEditAction_SelectAllSameMesh::ExecuteAction),
 		FCanExecuteAction()
 	);
+	CommandList->MapAction(
+		FBAEditActionsCommands::Get().CreateFactory,
+		FExecuteAction::CreateStatic(&FBAEditAction_CreateFactory::ExecuteAction),
+		FCanExecuteAction()
+	);
 
 	//CreateButtonInContentBar();
 	ExtendEditMenu();
@@ -113,6 +119,7 @@ void FBAEditActions::ExtendEditMenu()
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().HasConstructorComponents);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().MoveActorsToLevelFolder);
 							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().SelectAllSameMesh);
+							MenuBuilder.AddMenuEntry(FBAEditActionsCommands::Get().CreateFactory);
 						}
 					),
 					false,

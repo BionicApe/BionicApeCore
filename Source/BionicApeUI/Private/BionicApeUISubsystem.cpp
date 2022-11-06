@@ -22,10 +22,6 @@ void UBionicApeUISubsystem::Initialize(FSubsystemCollectionBase& Collection)
 	{
 		FunctionProvider = Cast<IMenuFunctionProvider>(MyGameInstance);
 	}
-	else
-	{
-		UE_LOG(LogBionicApeUI, Error, TEXT("BionicApeUISubsystem GameInstance does not implements IMenuFunctionProvider"));
-	}
 }
 
 void UBionicApeUISubsystem::LoadMenu()

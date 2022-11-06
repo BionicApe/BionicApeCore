@@ -4,6 +4,7 @@
 #include "Helpers/ViewportWidgetHelper.h"
 #include "Camera/Cameracomponent.h"
 #include "GameFramework/RotatingMovementComponent.h"
+#include "Components/ChildActorComponent.h"
 
 // Sets default values
 AViewportWidgetHelper::AViewportWidgetHelper()
@@ -19,6 +20,9 @@ AViewportWidgetHelper::AViewportWidgetHelper()
 
 	RotatingMovementComponent = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovementComponent"));
 	RotatingMovementComponent->RotationRate.Yaw = 40.f;
+	
+	ChildActor = CreateDefaultSubobject<UChildActorComponent>(TEXT("ChildActor"));
+	ChildActor->SetupAttachment(RootComponent);
 }
 
 
@@ -26,4 +30,16 @@ AViewportWidgetHelper::AViewportWidgetHelper()
 void AViewportWidgetHelper::SetNewObject(UObject* NewObj)
 {
 	OnNewObject(NewObj);
+}
+
+void AViewportWidgetHelper::SpawnChildActor(TSubclassOf<AActor> Class)
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		//TODO: LOG
+		return;
+	}
+
+	ChildActor->SetChildActorClass(Class);
 }

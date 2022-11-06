@@ -30,4 +30,5 @@ public:
 	TSharedPtr<FUICommandInfo> HasConstructorComponents;
 	TSharedPtr<FUICommandInfo> MoveActorsToLevelFolder;
 	TSharedPtr<FUICommandInfo> SelectAllSameMesh;	
+	TSharedPtr<FUICommandInfo> CreateFactory;
 };

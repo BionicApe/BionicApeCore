@@ -17,6 +17,7 @@ void FBAEditActionsCommands::RegisterCommands()
 	UI_COMMAND(HasConstructorComponents, "HasConstructorComponents", "Has Constructor Components", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(MoveActorsToLevelFolder, "MoveActorsToLevelFolder", "Move Actors To Level Folder", EUserInterfaceActionType::Button, FInputGesture());
 	UI_COMMAND(SelectAllSameMesh, "SelectAllSameMesh", "Select all Actors with the same Mesh", EUserInterfaceActionType::Button, FInputGesture());
+	UI_COMMAND(CreateFactory, "Create Factory", "Creates a Factory", EUserInterfaceActionType::Button, FInputGesture());
 }
 
 #undef LOCTEXT_NAMESPACE

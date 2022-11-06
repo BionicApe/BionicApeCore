@@ -8,6 +8,7 @@
 
 class UCameraComponent;
 class URotatingMovementComponent;
+class UChildActorComponent;
 
 UCLASS()
 class BIONICAPECORE_API AViewportWidgetHelper : public AActor
@@ -21,6 +22,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	URotatingMovementComponent* RotatingMovementComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UChildActorComponent* ChildActor;
+
 public:	
 	// Sets default values for this actor's properties
 	AViewportWidgetHelper();
@@ -30,4 +34,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void SetNewObject(UObject* NewObj);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void SpawnChildActor(TSubclassOf<AActor> Class);
 };
