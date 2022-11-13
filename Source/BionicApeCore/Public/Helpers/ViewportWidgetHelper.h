@@ -16,6 +16,9 @@ class BIONICAPECORE_API AViewportWidgetHelper : public AActor
 	GENERATED_BODY()
 public:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+		class USpringArmComponent* SpringArmComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* CameraComponent;
 

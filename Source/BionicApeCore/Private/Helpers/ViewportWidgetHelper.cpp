@@ -2,9 +2,10 @@
 
 
 #include "Helpers/ViewportWidgetHelper.h"
-#include "Camera/Cameracomponent.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Components/ChildActorComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 // Sets default values
 AViewportWidgetHelper::AViewportWidgetHelper()
@@ -14,9 +15,12 @@ AViewportWidgetHelper::AViewportWidgetHelper()
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
+	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
+	SpringArmComp->SetupAttachment(RootComponent);
+	SpringArmComp->SetRelativeLocation(FVector(-50.f, 0.f, 0.f));
+
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
-	CameraComponent->SetupAttachment(RootComponent);
-	CameraComponent->SetRelativeLocation(FVector(-300.f, 0.f, 0.f));
+	CameraComponent->AttachToComponent(SpringArmComp, FAttachmentTransformRules::KeepRelativeTransform);
 
 	RotatingMovementComponent = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovementComponent"));
 	RotatingMovementComponent->RotationRate.Yaw = 40.f;

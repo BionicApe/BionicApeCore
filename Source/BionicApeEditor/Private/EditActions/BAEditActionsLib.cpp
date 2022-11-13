@@ -91,7 +91,7 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 			RootComponent->RegisterComponent();
 			SpawnedActor->SetRootComponent(RootComponent);
 		}
-		RootComponent->SetMobility(Options.bForceStatic ? EComponentMobility::Static : Actor->GetRootComponent()->Mobility);		
+		RootComponent->SetMobility(Options.bForceStatic ? EComponentMobility::Static : Actor->GetRootComponent()->Mobility.GetValue());		
 	}
 
 	bool bHasExtracted = false;
@@ -114,7 +114,7 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 					FActorLabelUtilities::SetActorLabelUnique(MeshActor, StaticMesh->GetName());
 					MeshActor->Tags.Add("BAEditActions_Extracted");
 					CreatedComp = MeshActor->GetStaticMeshComponent();
-					CreatedComp->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalStaticMeshComp->Mobility);
+					CreatedComp->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalStaticMeshComp->Mobility.GetValue());
 				}
 				else
 				{
@@ -122,7 +122,7 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 					//CreatedComp->CreationMethod = EComponentCreationMethod::Instance;
 					SpawnedActor->AddInstanceComponent(CreatedComp);
 					CreatedComp->SetWorldTransform(OriginalStaticMeshComp->GetComponentTransform());
-					CreatedComp->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalStaticMeshComp->Mobility);
+					CreatedComp->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalStaticMeshComp->Mobility.GetValue());
 					CreatedComp->AttachToComponent(SpawnedActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 					CreatedComp->OnComponentCreated();
 					CreatedComp->RegisterComponent();
@@ -179,7 +179,7 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 				LightActor->Tags.Add("BAEditActions_Extracted");
 
 				NewLightComponent = LightActor->GetLightComponent();
-				NewLightComponent->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalLightComp->Mobility);
+				NewLightComponent->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalLightComp->Mobility.GetValue());
 			}
 			else
 			{
@@ -187,7 +187,7 @@ bool FBAEditActionsLib::SpawnActorsFromComponents(AActor* Actor, UWorld* World, 
 				//NewLightComponent->CreationMethod = EComponentCreationMethod::Instance;
 				SpawnedActor->AddInstanceComponent(NewLightComponent);
 				NewLightComponent->SetWorldTransform(OriginalLightComp->GetComponentTransform());
-				NewLightComponent->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalLightComp->Mobility);
+				NewLightComponent->SetMobility(Options.bForceStatic ? EComponentMobility::Static : OriginalLightComp->Mobility.GetValue());
 				NewLightComponent->AttachToComponent(SpawnedActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 				NewLightComponent->OnComponentCreated();
 				NewLightComponent->RegisterComponent();

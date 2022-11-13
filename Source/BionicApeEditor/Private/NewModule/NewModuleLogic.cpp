@@ -205,7 +205,7 @@ namespace
 				FileManager.MakeDirectory(*FormattedNewDirectoryName);
 			}
 
-			for (const auto FileToCopy : FilesInDirectory)
+			for (const FString& FileToCopy : FilesInDirectory)
 			{
 				const FString FullFilePath = FPaths::Combine(ModuleTemplateDirectory, NextRelativeDirectory, FileToCopy);
 
@@ -248,7 +248,7 @@ namespace
 			FileManager.FindFiles(result, *DirectoryWithWildcard, false, true);
 			return result;
 		}();
-		for (const auto Subdirectory : Subdirectories)
+		for (const FString& Subdirectory : Subdirectories)
 		{
 			const FString RelativeDirectory = FPaths::Combine(NextRelativeDirectory, Subdirectory);
 			RelativeDirectoryQueue.Enqueue(RelativeDirectory);
